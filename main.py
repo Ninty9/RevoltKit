@@ -15,7 +15,7 @@ from revolt import Masquerade, WebsiteEmbed, SendableEmbed, MessageReply
 from websockets.cli import print_over_input
 
 pk = Client(user_agent="ninty0808@gmail.com");
-path = 'users.pickle'
+path = 'users.txt'
 users = list()
 prefix = "rk;"
 class Client(commands.CommandsClient):
@@ -42,7 +42,7 @@ class Client(commands.CommandsClient):
                     continue
                 if len(member.proxy_tags.json()) == 0:
                     continue
-                members.append({'id': member.id.id, 'proxies': member.proxy_tags.json()})
+                members.append({'id': member.id.uuid, 'proxies': member.proxy_tags.json()})
             except:
                 print("error in members");
         user['members'] = members
@@ -60,6 +60,7 @@ class Client(commands.CommandsClient):
             return
         client = pluralkit.Client(user['token'])
         proxier = None
+        content = message.content
         try:
             for member in user['members']:
                 if proxier is not None:
@@ -73,6 +74,8 @@ class Client(commands.CommandsClient):
                         proxier = await client.get_member(member['id'])
                         print("b")
                         user['members'].insert(0,user['members'].pop(user['members'].index(member)))
+                        content.removeprefix(proxy['prefix'])
+                        content.removesuffix(proxy['suffix'])
                         break
 
             if proxier is None:
@@ -104,8 +107,9 @@ class Client(commands.CommandsClient):
         if proxier.webhook_avatar_url is not None:
             avatar = proxier.webhook_avatar_url
         print(color)
+
         await message.channel.send(content=message.content,
-                                   masquerade=Masquerade(name=name, avatar=avatar, colour=color))
+                                   masquerade=Masquerade(name=name[:32], avatar=avatar, colour=color))
         await message.delete()
 
 
