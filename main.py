@@ -138,8 +138,8 @@ async def fetch(message: Message):
                 warn = True
     except:
         if user['warn']:
-            await message.channel.send(content=f"""There was an issue getting your entire member list, i wont be able to proxy any messages!
-                Use {prefix}auth [token] if you want me to be able to access your private member list, or {prefix}warn off to turn messages like these off.
+            await message.channel.send(content=f"""There was an issue when getting your entire member list, I won't be able to proxy any messages!
+                Please use {prefix}auth [token] if you want me to be able to access your privated member list, or {prefix}warn off to turn messages like these off.
                 If you have your token set and are still seeing this please try to contact support.""")
         return
 
