@@ -101,7 +101,7 @@ async def proxy(message: Message):
     match arg:
         case "on":
             user['proxy'] = True
-            await message.channel.send(content="Messages now be proxied!")
+            await message.channel.send(content="Messages will now be proxied!")
         case "off":
             user['proxy'] = False
             await message.channel.send(content="Messages will no longer be proxied. ):")
@@ -172,7 +172,7 @@ async def send(message: Message):
     except pluralkit.Unauthorized:
         if user['warn']:
             await message.channel.send(content=f"""I'm not authorised to access this member or your fronters!
-Use {prefix}auth [token] to set your token or {prefix}warn off to turn messages like this off.""")
+Use `{prefix}auth [token]` to set your token, or `{prefix}warn off` to turn messages like this off.""")
 
     if proxier is None:
         return
