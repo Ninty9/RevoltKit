@@ -3,12 +3,11 @@ import json
 import os
 import shlex
 import shutil
-from collections.abc import Sequence
-from datetime import datetime
+from datetime import timedelta
 
 import pluralkit
-from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
 import pyvolt
+from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
 from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus
 
 path = 'users.txt'
@@ -25,7 +24,7 @@ bot = Client(token=token, bot=True)
 
 
 class Command:
-    def __init__(self, name, description, run):
+    def __init__(self, name, description, run, shorthand = False):
         self.name = name
         self.description = description
         self.run = run
@@ -183,21 +182,70 @@ async def help_command(message: Message):
     help_message = ""
     for command in commandList:
         help_message += "\n**" + command.name + "**\n" + command.description
-    await message.channel.send(content=help_message.removeprefix("\n"))
+    await message.channel.send(content=help_message.removeprefix("\n")) 
 
 async def switch_move(message: Message):
     arg = message.content.removeprefix(f"{prefix}switch move ")
     if arg == f"{prefix}switch move":
         await message.channel.send(content=f"You need to add a member")
         return
-    date = datetime.strptime(arg, "%h:%m")
-    print(date)
+    user = next((x for x in users if x['rid'] == message.author.id), None)
+    client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
+    minutes=0
+    hours=0
+    days=0
+    for a in shlex.split(arg):
+        if a.endswith("m"):
+            minutes = int(a.removesuffix("m"))
+            continue
+        if a.endswith("h"):
+            hours = int(a.removesuffix("h"))
+            continue
+        if a.endswith("d"):
+            days = int(a.removesuffix("d"))
+            continue
+    time = timedelta(days=days, hours=hours, minutes=minutes)
+    if time.total_seconds() == 0:
+        #todo: time is 0
+        await message.channel.send(content="no tiem")
+        return
+
+    switch1, switch2 = None, None
+    try:
+        async for s in client.get_switches(system=user['did'], limit=2):
+            if switch1 is None:
+                switch1 = s
+            elif switch2 is None:
+                switch2 = s
+            else:
+                break
+        newtime = switch1.timestamp.datetime - time
+        if switch2 is None:
+            # todo:  cant move switch if only one switch
+            return
+        if newtime < switch2.timestamp.datetime:
+            # todo:  cant move switch before prev switch
+            return
+        await client.update_switch(switch=switch1.id, timestamp=newtime)
+        # todo: messsage
+    except Unauthorized:
+        if user['warn']:
+            await message.channel.send(content="no auth")
+            # todo: unautorised
 
 async def switch_delete(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
-    async for s in client.get_switches(system=user['did'], limit=1):
-        await client.delete_switch(s.id)
+    try:
+        async for s in client.get_switches(system=user['did'], limit=1):
+            await client.delete_switch(s.id)
+            # todo: words
+            return
+    except Unauthorized:
+        if user['warn']:
+            await message.channel.send(content="no auth")
+            # todo: unautorised
+    #todo: no swtich found
 
 
 async def switch_edit(message: Message):
@@ -214,9 +262,16 @@ async def switch_edit(message: Message):
             mems.append(pluralkit.MemberId(id=a))
         else:
             mems.append(pluralkit.MemberId(uuid=mem['id']))
-    async for s in client.get_switches(system=user['did'], limit=1):
-        await client.update_switch(switch=s.id, members=mems)
-
+    try:
+        async for s in client.get_switches(system=user['did'], limit=1):
+            await client.update_switch(switch=s.id, members=mems)
+            # todo: words
+            return
+    except Unauthorized:
+        if user['warn']:
+            await message.channel.send(content="no auth")
+            # todo: unautorised
+    # todo: no switches found?
     return
 
 
@@ -234,8 +289,12 @@ async def switch(message: Message):
             mems.append(pluralkit.MemberId(id=a))
         else:
             mems.append(pluralkit.MemberId(uuid=mem['id']))
-
-    await client.new_switch(*mems)
+    try:
+        await client.new_switch(*mems)
+    except:
+        # todo: error while switching
+        await message.channel.send(content="help")
+    #todo: words
     return
 
 commandList: list[Command] = list()
@@ -263,13 +322,16 @@ async def on_ready(_) -> None:
     Command(name="id", description=f"usage: {prefix}id | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
     Command(name="help", description=f"usage: {prefix}help | You're looking at it right now!", run=help_command)
-    Command(name="switch move", description=f"usage: {prefix}switch move 3m | Move a switch to some time ago (Requires Auth)", run=switch_move)
-    Command(name="switch edit", description=f"usage: {prefix}switch edit | Edit your current switch (Requires Auth)", run=switch_edit)
-    Command(name="switch delete", description=f"usage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch_delete)
+    Command(name="switch move", description=f"usage: {prefix}switch move 3m | Move a switch to some time ago (Requires Auth)", run=switch_move, shorthand=True)
+    Command(name="switch edit", description=f"usage: {prefix}switch edit | Edit your current switch (Requires Auth)", run=switch_edit, shorthand=True)
+    Command(name="switch delete", description=f"usage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch_delete, shorthand=True)
     Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
     Command(name="auto", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
-
+    Command(name="sw move", description="switch shorthand", run=switch_move, shorthand=True)
+    Command(name="sw edit", description="switch shorthand", run=switch_edit, shorthand=True)
+    Command(name="sw delete", description="switch shorthand", run=switch_delete, shorthand=True)
+    Command(name="sw", description="switch shorthand", run=switch, shorthand=True)
     print(commandList)
     print('Logged on as', bot.me)
 
