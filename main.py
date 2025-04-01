@@ -16,7 +16,12 @@ prefix = "rk;"
 
 self_bot = False
 
-bot = Client(token='oJVKA1bGSVxkxWzVsw0uguHs6saG6S-BdgRst9nYPr5AmhjufHb9x86r2tkB9KGd', bot=True)
+with open('token.txt', 'r') as file:
+    # Serialize and write the variable to the file
+    token = file.read()
+    print(users)
+
+bot = Client(token=token, bot=True)
 
 
 @bot.on(ReadyEvent)
