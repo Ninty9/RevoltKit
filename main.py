@@ -74,6 +74,15 @@ async def on_message(event: MessageCreateEvent):
     if message.content.startswith(prefix+"remove"):
         await remove(message)
         return
+    if message.content.startswith(prefix+"switch delete"):
+        # todo: await switch(message)
+        return
+    if message.content.startswith(prefix+"switch move"):
+        # todo: await switch(message)
+        return
+    if message.content.startswith(prefix+"switch edit"):
+        # todo: await switch(message)
+        return
     if message.content.startswith(prefix+"switch"):
         # todo: await switch(message)
         return
