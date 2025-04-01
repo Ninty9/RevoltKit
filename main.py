@@ -144,9 +144,9 @@ async def fetch(message: Message):
 
     user['members'] = members
     if warn and user['warn']:
-        await message.channel.send(content=f"""There was an issue getting some of your members, you probably have some private members without having your token set, this is fine though!
+        await message.channel.send(content=f"""There was an issue getting some of your members. You probably have some private members without having your token set, this is fine though!
         Use {prefix}auth [token] if you want me to be able to access private members, or {prefix}warn off to turn messages like these off.
-        If you have your token set and are still seeing this please try to contact support.""")
+        If you have your token set and are still seeing this, please try to contact support!""")
     else:
         await message.channel.send(content=f"Done!")
 
@@ -174,6 +174,7 @@ async def auto(message: Message):
         case _:
             if arg == f"{prefix}proxy":
                 await message.channel.send(content=f"Missing argument, use {prefix}auto [off/front/latch]")
+                # todo: return current setting -pan
             else:
                 await message.channel.send(content=f"Incorrect argument, use {prefix}auto [off/front/latch]")
 
@@ -187,7 +188,7 @@ async def help_command(message: Message):
 async def switch_move(message: Message):
     arg = message.content.removeprefix(f"{prefix}switch move ")
     if arg == f"{prefix}switch move":
-        await message.channel.send(content=f"You need to add a member")
+        await message.channel.send(content=f":x: No time specified, move cancelled")
         return
     user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
@@ -206,8 +207,8 @@ async def switch_move(message: Message):
             continue
     time = timedelta(days=days, hours=hours, minutes=minutes)
     if time.total_seconds() == 0:
-        #todo: time is 0
-        await message.channel.send(content="no tiem")
+        #done: time is 0
+        await message.channel.send(content=":x: That's... now?")
         return
 
     switch1, switch2 = None, None
@@ -221,17 +222,20 @@ async def switch_move(message: Message):
                 break
         newtime = switch1.timestamp.datetime - time
         if switch2 is None:
-            # todo:  cant move switch if only one switch
+            # done:  cant move switch if only one switch
+            await message.channel.send(content=":x: I can't move your only switch registered!")
             return
         if newtime < switch2.timestamp.datetime:
-            # todo:  cant move switch before prev switch
+            # done:  cant move switch before prev switch
+            await message.channel.send(content=":x: Can't move your switch before your previous switch, as this would cause conflicts!")
             return
         await client.update_switch(switch=switch1.id, timestamp=newtime)
-        # todo: messsage
+        await message.channel.send(content=":white_check_mark: Switch moved to <time>")
+        # todo: actually add the time in
     except Unauthorized:
         if user['warn']:
-            await message.channel.send(content="no auth")
-            # todo: unautorised
+            await message.channel.send(content=":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
+            # done: unauthorised
 
 async def switch_delete(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
@@ -239,19 +243,20 @@ async def switch_delete(message: Message):
     try:
         async for s in client.get_switches(system=user['did'], limit=1):
             await client.delete_switch(s.id)
-            # todo: words
+            # done: words
+            await message.channel.send(content=":white_check_mark: Switch deleted!")
             return
     except Unauthorized:
         if user['warn']:
-            await message.channel.send(content="no auth")
-            # todo: unautorised
-    #todo: no swtich found
+            await message.channel.send(content=":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
+            # done: unauthorised
+    #todo: no switch found
 
 
 async def switch_edit(message: Message):
     arg = message.content.removeprefix(f"{prefix}switch edit ")
     if arg == f"{prefix}switch edit":
-        await message.channel.send(content=f"You need to add a member")
+        await message.channel.send(content=f":x: You need to add a member!")
         return
     user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
@@ -265,12 +270,13 @@ async def switch_edit(message: Message):
     try:
         async for s in client.get_switches(system=user['did'], limit=1):
             await client.update_switch(switch=s.id, members=mems)
-            # todo: words
+            # done: words
+            await message.channel.send(content=":white_check_mark: Switch logged!")
             return
     except Unauthorized:
         if user['warn']:
-            await message.channel.send(content="no auth")
-            # todo: unautorised
+            await message.channel.send(content=":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
+            # done: unauthorised
     # todo: no switches found?
     return
 
@@ -278,7 +284,7 @@ async def switch_edit(message: Message):
 async def switch(message: Message):
     arg = message.content.removeprefix(f"{prefix}switch ")
     if arg == f"{prefix}switch":
-        await message.channel.send(content=f"You need to add a member")
+        await message.channel.send(content=f":x: No member found to switch to.")
         return
     user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
@@ -292,9 +298,11 @@ async def switch(message: Message):
     try:
         await client.new_switch(*mems)
     except:
-        # todo: error while switching
-        await message.channel.send(content="help")
-    #todo: words
+        # done: error while switching
+        await message.channel.send(content=":x: There was an error while switching.")
+    #done?: words
+        await message.channel.send(content=":white_check_mark: Switch logged!")
+    
     return
 
 commandList: list[Command] = list()
