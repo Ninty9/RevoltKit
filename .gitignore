@@ -7,6 +7,7 @@ __pycache__/
 *.so
 
 users.txt
+usersbackup.txt
 
 # Distribution / packaging
 .Python
@@ -129,6 +130,7 @@ venv/
 ENV/
 env.bak/
 venv.bak/
+bot-env/
 
 # Spyder project settings
 .spyderproject
