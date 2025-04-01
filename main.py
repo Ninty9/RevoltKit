@@ -115,7 +115,7 @@ async def id_command(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
         users.append({'did': arg, 'rid': message.author.id, 'members': [], 'token': None, 'warn': True, 'proxy': True, 'case': False, 'auto': [], 'latch': False})
-        await message.channel.send(content=f"Set id to {arg}! \nPlease use {prefix}fetch so i can find your proxy, if you want me to be able to access private members also add your token, My code shouldn't contain anything that edits your system, but this is still a security risk!")
+        await message.channel.send(content=f"Set id to {arg}! \nPlease use {prefix}fetch so I can find your proxy tags. If you want me to be able to access private members too, run {prefix}auth with your token! I don't edit your members, but this is still a security risk.")
     else:
         user['did'] = arg
         await message.channel.send(content=f"Set id to {arg}!")
@@ -148,7 +148,7 @@ async def fetch(message: Message):
         Use {prefix}auth [token] if you want me to be able to access private members, or {prefix}warn off to turn messages like these off.
         If you have your token set and are still seeing this, please try to contact support!""")
     else:
-        await message.channel.send(content=f"Done!")
+        await message.channel.send(content=f"PK info updated!")
 
 
 async def auto(message: Message):
@@ -330,10 +330,10 @@ async def on_ready(_) -> None:
     Command(name="id", description=f"usage: {prefix}id | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
     Command(name="help", description=f"usage: {prefix}help | You're looking at it right now!", run=help_command)
-    Command(name="switch move", description=f"usage: {prefix}switch move 3m | Move a switch to some time ago (Requires Auth)", run=switch_move, shorthand=True)
-    Command(name="switch edit", description=f"usage: {prefix}switch edit | Edit your current switch (Requires Auth)", run=switch_edit, shorthand=True)
-    Command(name="switch delete", description=f"usage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch_delete, shorthand=True)
-    Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)", run=switch)
+    Command(name="switch move", description=f"sw move", run=switch_move, shorthand=True)
+    Command(name="switch edit", description=f"sw edit", run=switch_edit, shorthand=True)
+    Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
+    Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
     Command(name="auto", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
     Command(name="sw move", description="switch shorthand", run=switch_move, shorthand=True)
@@ -425,7 +425,7 @@ async def send(message: Message):
 
     except Unauthorized:
         if user['warn']:
-            await message.channel.send(content=f"""I'm not authorised to access this member or your fronters!
+            await message.channel.send(content=f""":warning: I'm not authorised to access this member or your current fronters!
 Use {prefix}auth [token] to set your token or {prefix}warn off to turn messages like this off.""")
 
     if proxier is None:
