@@ -93,8 +93,8 @@ async def case(message: Message):
 async def setup(message: Message):
     # todo
     await message.channel.send(content="""Use `rk;id [SystemID or Discord ID]` to tell RevoltKit who you are!
-(**OPTIONAL** if your members, proxies, and front are public!) Use `rk;auth [PluralKitToken]` if you've got any private information, or RevoltKit won't be able to proxy.
-Finally, to complete setup, use `rk;fetch`! After this first time, every time you update your proxies on PluralKit, you'll have to run it again to update it on RevoltKit. It doesn't update automatically.""")
+(**OPTIONAL** if your **members, proxies, and front** are **public!**) Use `rk;auth [PluralKitToken]` if you've got private information, or RevoltKit won't be able to proxy properly.
+Finally, to complete setup, use `rk;fetch`! After this first time, every time you update your information on PluralKit (such as proxy tags or members), you'll have to run it again to update it on RevoltKit. It doesn't update automatically.""")
 
 
 async def auth(message: Message):
@@ -255,20 +255,20 @@ async def on_ready(_) -> None:
         print("failure loading data, making backup of file")
         shutil.copy(path, path.removesuffix(".txt") + "backup.txt")
     asyncio.create_task(save())
-    Command(name="proxy", description=f"usage: {prefix}proxy [on/off]\nTurn proxying on or off", run=proxy)
-    Command(name="remove", description=f"usage: {prefix}remove", run=remove)
-    Command(name="warn", description=f"usage: {prefix}warn", run=warn)
-    Command(name="setup", description=f"usage: {prefix}setup", run=setup)
-    Command(name="auth", description=f"usage: {prefix}auth", run=auth)
-    Command(name="id", description=f"usage: {prefix}id", run=id_command)
-    Command(name="fetch", description=f"usage: {prefix}fetch", run=fetch)
-    Command(name="help", description=f"usage: {prefix}help", run=help_command)
-    Command(name="switch move", description=f"usage: {prefix}switch", run=switch_move)
-    Command(name="switch edit", description=f"usage: {prefix}switch", run=switch_edit)
-    Command(name="switch delete", description=f"usage: {prefix}switch", run=switch_delete)
-    Command(name="switch", description=f"usage: {prefix}switch", run=switch)
-    Command(name="case", description=f"usage: {prefix}case", run=case)
-    Command(name="auto", description=f"usage: {prefix}auto", run=auto)
+    Command(name="proxy", description=f"usage: {prefix}proxy [on/off]\nTurn proxying on or off globally", run=proxy)
+    Command(name="remove", description=f"usage: {prefix}remove\nMake RevoltKit forget everything it knows about you", run=remove)
+    Command(name="warn", description=f"usage: {prefix}warn\nToggle error messages (such as authorization issues)", run=warn)
+    Command(name="setup", description=f"usage: {prefix}setup\nA quick setup guide for RevoltKit", run=setup)
+    Command(name="auth", description=f"usage: {prefix}auth\nGive RevoltKit authorization to view private information and log switches", run=auth)
+    Command(name="id", description=f"usage: {prefix}id\nSet your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\nNote that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
+    Command(name="fetch", description=f"usage: {prefix}fetch\nTell RevoltKit to update your PluralKit information", run=fetch)
+    Command(name="help", description=f"usage: {prefix}help\nYou're looking at it right now!", run=help_command)
+    Command(name="switch move", description=f"usage: {prefix}switch move 3m\nMove a switch to some time ago\n(Requires Auth)", run=switch_move)
+    Command(name="switch edit", description=f"usage: {prefix}switch edit\nEdit your current switch\n(Requires Auth)", run=switch_edit)
+    Command(name="switch delete", description=f"usage: {prefix}switch delete\nDelete your current switch\n(Requires Auth)", run=switch_delete)
+    Command(name="switch", description=f"usage: {prefix}switch [name]\nLog a new switch with the specified members\n(Requires Auth)", run=switch)
+    Command(name="case", description=f"usage: {prefix}case\nToggle your proxy's case sensitivity", run=case)
+    Command(name="auto", description=f"usage: {prefix}auto [front/latch]\nSet your autoproxy state per-server\nFront mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
 
     print(commandList)
     print('Logged on as', bot.me)
