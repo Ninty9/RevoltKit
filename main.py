@@ -235,7 +235,7 @@ async def switch_move(message: Message):
     time = timedelta(days=days, hours=hours, minutes=minutes)
     if time.total_seconds() == 0:
         #done: time is 0
-        await message.channel.send(content=":x: That's... now?")
+        await message.channel.send(content=":x: I can't move a switch to nowhere... Please give a time that isn't 0!")
         return
 
     switch1, switch2 = None, None
@@ -363,8 +363,8 @@ async def on_ready(_) -> None:
     Command(name="remove", description=f"usage: {prefix}remove | Make RevoltKit forget everything it knows about you", run=remove)
     Command(name="warn", description=f"usage: {prefix}warn | Toggle error messages (such as authorization issues)", run=warn)
     Command(name="setup", description=f"usage: {prefix}setup | A quick setup guide for RevoltKit", run=setup)
-    Command(name="auth", description=f"usage: {prefix}auth | Give RevoltKit authorization to view private information and log switches", run=auth)
-    Command(name="id", description=f"usage: {prefix}id | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
+    Command(name="auth", description=f"usage: {prefix}auth [token] | Give RevoltKit authorization to view private information and log switches", run=auth)
+    Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
     Command(name="help", description=f"usage: {prefix}help | You're looking at it right now!", run=help_command)
     Command(name="switch move", description=f"sw move", run=switch_move, shorthand=True)
