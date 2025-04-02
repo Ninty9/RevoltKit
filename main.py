@@ -71,30 +71,30 @@ async def remove(message: Message):
         await message.channel.send(content=f"Are you sure? type `{prefix}remove confirm` to confirm")
 
 
-async def warn(message: Message):
+async def error(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
         # todo: print you dont exist message
         return
-    arg = message.content.removeprefix(f"{prefix}warn ")
+    arg = message.content.removeprefix(f"{prefix}error ")
     match arg:
         case "on":
-            user['warn'] = True
-            await message.channel.send(content="Warnings will now be displayed.")
+            user['error'] = True
+            await message.channel.send(content="Errors will now be displayed.")
         case "off":
-            user['warn'] = False
-            await message.channel.send(content="Warnings will no longer be displayed.")
+            user['error'] = False
+            await message.channel.send(content="Errors will no longer be displayed.")
         case _:
-            if arg == f"{prefix}warn":
-                if user['warn']:
+            if arg == f"{prefix}error":
+                if user['error']:
                     # todo: i wrote these, double check em?
-                    await message.channel.send(content="Warnings are turned on.")
+                    await message.channel.send(content="Errors are turned on.")
                     return
                 else:
-                    await message.channel.send(content="Warnings are not turned on.")
+                    await message.channel.send(content="Errors are not turned on.")
                     return
             else:
-                await message.channel.send(content=f"Incorrect argument, use {prefix}warn [on/off]")
+                await message.channel.send(content=f"Incorrect argument, use {prefix}error [on/off]")
 
 
 async def case(message: Message):
@@ -102,7 +102,7 @@ async def case(message: Message):
     if user is None:
         # todo: print you dont exist message
         return
-    arg = message.content.removeprefix(f"{prefix}warn ")
+    arg = message.content.removeprefix(f"{prefix}case ")
     match arg:
         case "on":
             user['case'] = True
@@ -151,7 +151,7 @@ async def id_command(message: Message):
         return
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
-        users.append({'did': arg, 'rid': message.author.id, 'members': [], 'token': None, 'warn': True, 'proxy': True, 'case': False, 'auto': [], 'latch': False})
+        users.append({'did': arg, 'rid': message.author.id, 'members': [], 'token': None, 'error': True, 'proxy': True, 'case': False, 'auto': [], 'latch': False})
         await message.channel.send(content=f"Set id to {arg}! \nPlease use {prefix}fetch so I can find your proxy tags. If you want me to be able to access private members too, run {prefix}auth with your token! I don't edit your members, but this is still a security risk.")
     else:
         user['did'] = arg
@@ -164,7 +164,7 @@ async def fetch(message: Message):
         # todo: print you dont exist message
         return
     members = []
-    warn = False
+    error = False
     try:
         async for member in pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com").get_members(user['did']):
             try:
@@ -174,18 +174,18 @@ async def fetch(message: Message):
                     continue
                 members.append({'id': member.id.uuid, 'proxies': member.proxy_tags.json(), 'name': member.name})
             except:
-                warn = True
+                error = True
     except:
-        if user['warn']:
+        if user['error']:
             await message.channel.send(content=f"""There was an issue when getting your entire member list, I won't be able to proxy any messages!
-                Please use {prefix}auth [token] if you want me to be able to access your privated member list, or {prefix}warn off to turn messages like these off.
+                Please use {prefix}auth [token] if you want me to be able to access your privated member list, or {prefix}error off to turn messages like these off.
                 If you have your token set and are still seeing this please try to contact support.""")
         return
 
     user['members'] = members
-    if warn and user['warn']:
+    if error and user['error']:
         await message.channel.send(content=f"""There was an issue getting some of your members. You probably have some private members without having your token set, this is fine though!
-        Use {prefix}auth [token] if you want me to be able to access private members, or {prefix}warn off to turn messages like these off.
+        Use {prefix}auth [token] if you want me to be able to access private members, or {prefix}error off to turn messages like these off.
         If you have your token set and are still seeing this, please try to contact support!""")
     else:
         await message.channel.send(content=f"PK info updated!")
@@ -285,7 +285,7 @@ async def switch_move(message: Message):
         await message.channel.send(content=f":white_check_mark: Switch moved to {timestring}")
         # todo: actually add the time in
     except Unauthorized:
-        if user['warn']:
+        if user['error']:
             await message.channel.send(content=f":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
             # done: unauthorised
 
@@ -302,7 +302,7 @@ async def switch_delete(message: Message):
             await message.channel.send(content=":white_check_mark: Switch deleted!")
             return
     except Unauthorized:
-        if user['warn']:
+        if user['error']:
             await message.channel.send(content=f":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
     #todo: no switch found
 
@@ -331,7 +331,7 @@ async def switch_edit(message: Message):
             await message.channel.send(content=":white_check_mark: Switch logged!")
             return
     except Unauthorized:
-        if user['warn']:
+        if user['error']:
             await message.channel.send(content=":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
             # done: unauthorised
     # todo: no switches found?
@@ -397,7 +397,7 @@ async def on_ready(_) -> None:
     asyncio.create_task(save())
     Command(name="proxy", description=f"usage: {prefix}proxy [on/off] | Turn proxying on or off globally", run=proxy)
     Command(name="remove", description=f"usage: {prefix}remove | Make RevoltKit forget everything it knows about you", run=remove)
-    Command(name="warn", description=f"usage: {prefix}warn | Toggle error messages (such as authorization issues)", run=warn)
+    Command(name="error", description=f"usage: {prefix}error | Toggle error messages (such as authorization issues)", run=error)
     Command(name="setup", description=f"usage: {prefix}setup | A quick setup guide for RevoltKit", run=setup)
     Command(name="auth", description=f"usage: {prefix}auth [token] | Give RevoltKit authorization to view private information and log switches", run=auth)
     Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
@@ -499,9 +499,9 @@ async def send(message: Message):
                         break
 
     except Unauthorized:
-        if user['warn']:
-            await message.channel.send(content=f""":warning: I'm not authorised to access this member or your current fronters!
-Use {prefix}auth [token] to set your token or {prefix}warn off to turn messages like this off.""")
+        if user['error']:
+            await message.channel.send(content=f""":Error: I'm not authorised to access this member or your current fronters!
+Use {prefix}auth [token] to set your token or {prefix}error off to turn messages like this off.""")
 
     if proxier is None:
         return
