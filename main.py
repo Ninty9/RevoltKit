@@ -225,12 +225,13 @@ async def switch_move(message: Message):
             # done:  cant move switch if only one switch
             await message.channel.send(content=":x: I can't move your only switch registered!")
             return
+        timestring = newtime.strftime("format string goes here")
         if newtime < switch2.timestamp.datetime:
             # done:  cant move switch before prev switch
             await message.channel.send(content=":x: Can't move your switch before your previous switch, as this would cause conflicts!")
             return
         await client.update_switch(switch=switch1.id, timestamp=newtime)
-        await message.channel.send(content=":white_check_mark: Switch moved to <time>")
+        await message.channel.send(content=f":white_check_mark: Switch moved to {timestring}")
         # todo: actually add the time in
     except Unauthorized:
         if user['warn']:
