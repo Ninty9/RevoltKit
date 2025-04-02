@@ -252,12 +252,13 @@ async def switch_move(message: Message):
             # done:  cant move switch if only one switch
             await message.channel.send(content=":x: I can't move your only switch registered!")
             return
+        timestring = newtime.strftime("%H:%M:%S %b %d %Y")
         if newtime < switch2.timestamp.datetime:
             # done:  cant move switch before prev switch
             await message.channel.send(content=":x: Can't move your switch before your previous switch, as this would cause conflicts!")
             return
         await client.update_switch(switch=switch1.id, timestamp=newtime)
-        await message.channel.send(content=":white_check_mark: Switch moved to <time>")
+        await message.channel.send(content=f":white_check_mark: Switch moved to {timestring}")
         # todo: actually add the time in
     except Unauthorized:
         if user['warn']:
@@ -370,7 +371,7 @@ async def on_ready(_) -> None:
     Command(name="switch move", description=f"sw move", run=switch_move, shorthand=True)
     Command(name="switch edit", description=f"sw edit", run=switch_edit, shorthand=True)
     Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
-    Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
+    Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 1d 6h 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
     Command(name="auto", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
     Command(name="sw move", description="switch shorthand", run=switch_move, shorthand=True)
