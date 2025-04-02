@@ -28,11 +28,15 @@ class Command:
         self.name = name
         self.description = description
         self.run = run
+        self.shorthand = shorthand
         commandList.append(self)
 
 
 async def proxy(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        # todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}proxy ")
     match arg:
         case "on":
@@ -46,9 +50,12 @@ async def proxy(message: Message):
 
 
 async def remove(message: Message):
+    user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}remove ")
     if arg == "confirm":
-        user = next((x for x in users if x['rid'] == message.author.id), None)
         users.remove(user)
         await message.channel.send(content="I don't even know who you are...")
     else:
@@ -57,6 +64,9 @@ async def remove(message: Message):
 
 async def warn(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        # todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}warn ")
     match arg:
         case "on":
@@ -74,6 +84,9 @@ async def warn(message: Message):
 
 async def case(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        # todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}warn ")
     match arg:
         case "on":
@@ -98,6 +111,9 @@ Finally, to complete setup, use `rk;fetch`! After this first time, every time yo
 
 async def auth(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        # todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}auth ")
     if arg != f"{prefix}auth":
         user['token'] = arg
@@ -123,6 +139,9 @@ async def id_command(message: Message):
 
 async def fetch(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        # todo: print you dont exist message
+        return
     members = []
     warn = False
     try:
@@ -153,6 +172,9 @@ async def fetch(message: Message):
 
 async def auto(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}auto ")
     if type(message.channel) is not pyvolt.TextChannel:
         sid = message.channel.id
@@ -182,15 +204,20 @@ async def auto(message: Message):
 async def help_command(message: Message):
     help_message = ""
     for command in commandList:
+        if command.shorthand:
+            continue
         help_message += "\n**" + command.name + "**\n" + command.description
     await message.channel.send(content=help_message.removeprefix("\n")) 
 
 async def switch_move(message: Message):
+    user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}switch move ")
     if arg == f"{prefix}switch move":
         await message.channel.send(content=f":x: No time specified, move cancelled")
         return
-    user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
     minutes=0
     hours=0
@@ -239,6 +266,10 @@ async def switch_move(message: Message):
 
 async def switch_delete(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
+
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
     try:
         async for s in client.get_switches(system=user['did'], limit=1):
@@ -254,11 +285,14 @@ async def switch_delete(message: Message):
 
 
 async def switch_edit(message: Message):
+    user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}switch edit ")
     if arg == f"{prefix}switch edit":
         await message.channel.send(content=f":x: You need to add a member!")
         return
-    user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
     mems = []
     for a in shlex.split(arg):
@@ -282,11 +316,14 @@ async def switch_edit(message: Message):
 
 
 async def switch(message: Message):
+    user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
     arg = message.content.removeprefix(f"{prefix}switch ")
     if arg == f"{prefix}switch":
         await message.channel.send(content=f":x: No member found to switch to.")
         return
-    user = next((x for x in users if x['rid'] == message.author.id), None)
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
     mems = []
     for a in shlex.split(arg):
