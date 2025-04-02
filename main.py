@@ -208,7 +208,7 @@ async def switch_move(message: Message):
     time = timedelta(days=days, hours=hours, minutes=minutes)
     if time.total_seconds() == 0:
         #done: time is 0
-        await message.channel.send(content=":x: That's... now?")
+        await message.channel.send(content=":x: I can't move a switch to nowhere... Please give a time that isn't 0!")
         return
 
     switch1, switch2 = None, None
