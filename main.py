@@ -334,7 +334,7 @@ async def on_ready(_) -> None:
     Command(name="switch move", description=f"sw move", run=switch_move, shorthand=True)
     Command(name="switch edit", description=f"sw edit", run=switch_edit, shorthand=True)
     Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
-    Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
+    Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 1d 6h 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
     Command(name="auto", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
     Command(name="sw move", description="switch shorthand", run=switch_move, shorthand=True)
