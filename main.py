@@ -45,14 +45,23 @@ async def proxy(message: Message):
         case "off":
             user['proxy'] = False
             await message.channel.send(content="Messages will no longer be proxied. ):")
-        case _ if arg == f"{prefix}proxy":
-            await message.channel.send(content=f"Missing argument, use `{prefix}proxy [on/off]`")
+        case _:
+            if arg == f"{prefix}proxy":
+                if user['proxy']:
+                    # todo: i wrote these, double check em?
+                    await message.channel.send(content="Proxies are turned on.")
+                    return
+                else:
+                    await message.channel.send(content="Proxies are not turned on.")
+                    return
+            else:
+                await message.channel.send(content=f"Incorrect argument, use `{prefix}proxy [on/off]`")
 
 
 async def remove(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
-        #todo: print you dont exist message
+        # todo: print you dont exist message
         return
     arg = message.content.removeprefix(f"{prefix}remove ")
     if arg == "confirm":
@@ -76,8 +85,14 @@ async def warn(message: Message):
             user['warn'] = False
             await message.channel.send(content="Warnings will no longer be displayed.")
         case _:
-            if arg == f"{prefix}proxy":
-                await message.channel.send(content=f"Missing argument, use {prefix}warn [on/off]")
+            if arg == f"{prefix}warn":
+                if user['warn']:
+                    # todo: i wrote these, double check em?
+                    await message.channel.send(content="Warnings are turned on.")
+                    return
+                else:
+                    await message.channel.send(content="Warnings are not turned on.")
+                    return
             else:
                 await message.channel.send(content=f"Incorrect argument, use {prefix}warn [on/off]")
 
@@ -97,7 +112,13 @@ async def case(message: Message):
             await message.channel.send(content="Proxies are no longer case sensitive.")
         case _:
             if arg == f"{prefix}case":
-                await message.channel.send(content=f"Missing argument, use {prefix}case [on/off]")
+                if user['case']:
+                    # todo: i wrote these, double check em?
+                    await message.channel.send(content="Proxies are case sensitive.")
+                    return
+                else:
+                    await message.channel.send(content="Proxies are not case sensitive.")
+                    return
             else:
                 await message.channel.send(content=f"Incorrect argument, use {prefix}case [on/off]")
 
@@ -173,16 +194,23 @@ async def fetch(message: Message):
 async def auto(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
-        #todo: print you dont exist message
+        # todo: print you dont exist message
         return
     arg = message.content.removeprefix(f"{prefix}auto ")
     if type(message.channel) is not pyvolt.TextChannel:
         sid = message.channel.id
     else:
         sid = message.channel.server_id
-    auto = next((x for x in user['auto'] if x['server'] == sid), None)
-    if auto is not None:
-        user['auto'].remove(auto)
+        autoproxy = next((x for x in user['auto'] if x['server'] == sid), None)
+    if arg == f"{prefix}auto":
+        if autoproxy is None:
+            user['auto'].append({'mode': AutoproxyMode.OFF.value, 'server':sid})
+            autoproxy = next((x for x in user['auto'] if x['server'] == sid), None)
+        await message.channel.send(content=f"current thang is {autoproxy['mode']}")
+        # todo: make this words good
+        return
+    if autoproxy is not None:
+        user['auto'].remove(autoproxy)
     match arg:
         case AutoproxyMode.OFF.value:
             user['auto'].append({'mode': AutoproxyMode.OFF.value, 'server':sid})
@@ -194,11 +222,7 @@ async def auto(message: Message):
             user['auto'].append({'mode': AutoproxyMode.LATCH.value, 'server': sid})
             await message.channel.send(content="Will autoproxy with latch in this server. (note: current latch is global)")
         case _:
-            if arg == f"{prefix}proxy":
-                await message.channel.send(content=f"Missing argument, use {prefix}auto [off/front/latch]")
-                # todo: return current setting -pan
-            else:
-                await message.channel.send(content=f"Incorrect argument, use {prefix}auto [off/front/latch]")
+            await message.channel.send(content=f"Incorrect argument, use {prefix}auto [off/front/latch]")
 
 
 async def help_command(message: Message):
@@ -212,7 +236,7 @@ async def help_command(message: Message):
 async def switch_move(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
-        #todo: print you dont exist message
+        # todo: print you dont exist message
         return
     arg = message.content.removeprefix(f"{prefix}switch move ")
     if arg == f"{prefix}switch move":
@@ -262,26 +286,24 @@ async def switch_move(message: Message):
         # todo: actually add the time in
     except Unauthorized:
         if user['warn']:
-            await message.channel.send(content=":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
+            await message.channel.send(content=f":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
             # done: unauthorised
 
 async def switch_delete(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
-        #todo: print you dont exist message
+        # todo: print you dont exist message
         return
 
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
     try:
         async for s in client.get_switches(system=user['did'], limit=1):
             await client.delete_switch(s.id)
-            # done: words
             await message.channel.send(content=":white_check_mark: Switch deleted!")
             return
     except Unauthorized:
         if user['warn']:
-            await message.channel.send(content=":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
-            # done: unauthorised
+            await message.channel.send(content=f":x: I'm not authorised to do this. If you want to do this, use `{prefix}auth` with your token to authorise me and try again.")
     #todo: no switch found
 
 
@@ -315,6 +337,19 @@ async def switch_edit(message: Message):
     # todo: no switches found?
     return
 
+async def switch_out(message: Message):
+    user = next((x for x in users if x['rid'] == message.author.id), None)
+    if user is None:
+        #todo: print you dont exist message
+        return
+    client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
+    try:
+        await client.new_switch()
+        #todo: message
+    except:
+        # done: error while switching
+        await message.channel.send(content=":x: There was an error while switching.")
+
 
 async def switch(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
@@ -339,7 +374,7 @@ async def switch(message: Message):
         # done: error while switching
         await message.channel.send(content=":x: There was an error while switching.")
     #done?: words
-        await message.channel.send(content=":white_check_mark: Switch logged!")
+    await message.channel.send(content=":white_check_mark: Switch logged!")
     
     return
 
@@ -368,12 +403,14 @@ async def on_ready(_) -> None:
     Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
     Command(name="help", description=f"usage: {prefix}help | You're looking at it right now!", run=help_command)
+    Command(name="switch out", description=f"sw out", run=switch_out, shorthand=True)
     Command(name="switch move", description=f"sw move", run=switch_move, shorthand=True)
     Command(name="switch edit", description=f"sw edit", run=switch_edit, shorthand=True)
     Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
     Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 1d 6h 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
     Command(name="auto", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
+    Command(name="sw out", description=f"sw out", run=switch_out, shorthand=True)
     Command(name="sw move", description="switch shorthand", run=switch_move, shorthand=True)
     Command(name="sw edit", description="switch shorthand", run=switch_edit, shorthand=True)
     Command(name="sw delete", description="switch shorthand", run=switch_delete, shorthand=True)
