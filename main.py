@@ -16,9 +16,7 @@ prefix = "rk;"
 
 self_bot = False
 
-with open('token.txt', 'r', encoding='utf-8-sig') as file:
-    # Serialize and write the variable to the file
-    token = file.read()
+token = os.getenv("TOKEN")
 
 bot = Client(token=token, bot=True)
 
