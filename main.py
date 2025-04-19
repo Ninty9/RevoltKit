@@ -220,7 +220,7 @@ async def auto(message: Message):
 
 
 async def help_command(message: Message):
-    help_message = ""
+    help_message = "TEST"
     for command in commandList:
         if command.shorthand:
             continue
