@@ -548,7 +548,7 @@ def remove_prefix_ci(s: str, prefix: str) -> str:
     return s
 
 def remove_suffix_ci(s: str, suffix: str) -> str:
-    if s.lower().startswith(suffix.lower()):
+    if s.lower().endswith(suffix.lower()):
         return s[:-len(prefix)]
     return s
 
