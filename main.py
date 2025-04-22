@@ -376,7 +376,6 @@ async def on_ready(_) -> None:
         with open(path, 'r') as file:
             # Serialize and write the variable to the file
             users = json.loads(file.read())
-            print(users)
     except:
         print("failure loading data, making backup of file")
         shutil.copy(path, path.removesuffix(".txt") + "backup.txt")
