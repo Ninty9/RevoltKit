@@ -471,6 +471,8 @@ async def send(message: Message):
             else:
                 sid = message.channel.server_id
             auto = next((x for x in user['auto'] if x['server'] == sid), None)
+            if auto is None:
+                return
             match auto['mode']:
                 case AutoproxyMode.OFF.value:
                     return
