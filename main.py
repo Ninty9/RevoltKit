@@ -223,7 +223,7 @@ async def help_command(message: Message):
     for command in commandList:
         if command.shorthand:
             continue
-        await message.channel.send(content=command.name + "**\n" + command.description) 
+        await message.channel.send(content="**"+command.name + "**\n" + command.description) 
 
 async def switch_move(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
