@@ -220,12 +220,10 @@ async def auto(message: Message):
 
 
 async def help_command(message: Message):
-    help_message = ""
     for command in commandList:
         if command.shorthand:
             continue
-        help_message += "\n**" + command.name + "**\n" + command.description
-    await message.channel.send(content=help_message.removeprefix("\n")) 
+        await message.channel.send(content=command.name + "**\n" + command.description) 
 
 async def switch_move(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
