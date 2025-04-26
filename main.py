@@ -12,7 +12,7 @@ from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, Relationship
 
 path = 'users.txt'
 users = list()
-prefix = "rk;"
+prefix = os.getenv("PREFIX", "rk;")
 
 self_bot = False
 
@@ -220,10 +220,16 @@ async def auto(message: Message):
 
 
 async def help_command(message: Message):
+    help_message = ""
     for command in commandList:
         if command.shorthand:
             continue
-        await message.channel.send(content="**"+command.name + "**\n" + command.description) 
+        help_message += "**" + command.name + "**\n" + command.description + "\n"
+        if len(help_message) > 2000:
+            await message.channel.send(content=help_message.removesuffix("\n"))
+            help_message = ""
+    if help_message != "":
+        await message.channel.send(content=help_message.removesuffix("\n"))
 
 async def switch_move(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
@@ -400,6 +406,7 @@ async def on_ready(_) -> None:
     Command(name="sw", description="switch shorthand", run=switch, shorthand=True)
     print(commandList)
     print('Logged on as', bot.me)
+    await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
 
 
 @bot.on(MessageCreateEvent)
@@ -409,12 +416,16 @@ async def on_message(event: MessageCreateEvent):
     # don't respond to ourselves/others
     if (message.author.relationship is RelationshipStatus.user) ^ self_bot:
         return
+    if message.author.bot:
+        return
 
     if message.content.startswith(prefix):
         for command in commandList:
             if message.content.startswith(prefix+command.name):
                 await command.run(message)
                 return
+        await message.channel.send(content=message.content.split()[0] + " is not a valid command")
+        return
 
     # todo: nameformat command
 
