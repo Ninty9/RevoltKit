@@ -124,6 +124,15 @@ async def setup(message: Message):
 (**OPTIONAL** if your **members, proxies, and front** are **public!**) Use `rk;auth [PluralKitToken]` if you've got private information, or RevoltKit won't be able to proxy properly.
 Finally, to complete setup, use `rk;fetch`! After this first time, every time you update your information on PluralKit (such as proxy tags or members), you'll have to run it again to update it on RevoltKit. It doesn't update automatically.""")
 
+async def explain(message: Message):
+    # todo
+    await message.channel.send(content="""Hi, I'm RevoltKit! I'm a bot that lets you use the PluralKit API to proxy as yourself in Revolt, using Revolt's Masquerade functionality! ^^
+Both PluralKit and I function very similarly; we both check your messages to see if they match a pattern you've set, and re-send the message with the associated name, profile picture and color!
+
+This is useful for folk who're multiple people in one body (aka systems). people who wanna roleplay without the hassle of swapping accounts all the time, or... any other reason you'd wanna have multiple identities without multiple accounts, really.
+
+Due to Revolt limitations, proxied messages will show up with the `[BRIDGE]` tag; there's still definitely a person behind it, though! ^^;""")
+
 
 async def auth(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
