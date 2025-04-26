@@ -424,7 +424,7 @@ async def on_message(event: MessageCreateEvent):
             if message.content.startswith(prefix+command.name):
                 await command.run(message)
                 return
-        await message.channel.send(content=message.content.split()[0] + " is not a valid command")
+        await message.channel.send(content=message.content.split()[0] + " is not a valid command; please use rk;help to double-check my commands.")
         return
 
     # todo: nameformat command
