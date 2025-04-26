@@ -179,20 +179,15 @@ async def fetch(message: Message):
                 members.append({'id': member.id.uuid, 'proxies': member.proxy_tags.json(), 'name': member.name})
             except:
                 error = True
-    except:
+    except Exception as e:
         if user['error']:
-            await message.channel.send(content=f"""There was an issue when getting your entire member list, I won't be able to proxy any messages!
-                Please use {prefix}auth [token] if you want me to be able to access your privated member list, or {prefix}error off to turn messages like these off.
-                If you have your token set and are still seeing this please try to contact support.""")
+            await message.channel.send(content=f"""There was an issue when getting your member list, I won't be able to proxy any messages!
+                Please use `{prefix}auth [token]` if you want me to be able to access your privated member list, or `{prefix}error off` to turn messages like these off.
+                **If you have your token set and are still seeing this please try to contact support** (`rk;support`)**, here is your error message:\n"""+str(e))
         return
-
+    
     user['members'] = members
-    if error and user['error']:
-        await message.channel.send(content=f"""There was an issue getting some of your members. You probably have some private members without having your token set, this is fine though!
-        Use {prefix}auth [token] if you want me to be able to access private members, or {prefix}error off to turn messages like these off.
-        If you have your token set and are still seeing this, please try to contact support!""")
-    else:
-        await message.channel.send(content=f"PK info updated!")
+    await message.channel.send(content=f"PK info updated!")
 
 
 async def auto(message: Message):
