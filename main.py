@@ -132,6 +132,10 @@ Both PluralKit and I function very similarly; we both check your messages to see
 This is useful for folk who're multiple people in one body (aka systems). people who wanna roleplay without the hassle of swapping accounts all the time, or... any other reason you'd wanna have multiple identities without multiple accounts, really.
 
 Due to Revolt limitations, proxied messages will show up with the `[BRIDGE]` tag; there's still definitely a person behind it, though! ^^;""")
+    
+async def support(message: Message):
+    # todo
+    await message.channel.send(content="""You can find my support server [here](https://rvlt.gg/ReTf1nbS)!""")
 
 
 async def auth(message: Message):
@@ -414,6 +418,7 @@ async def on_ready(_) -> None:
     Command(name="sw edit", description="switch shorthand", run=switch_edit, shorthand=True)
     Command(name="sw delete", description="switch shorthand", run=switch_delete, shorthand=True)
     Command(name="sw", description="switch shorthand", run=switch, shorthand=True)
+    Command(name="support", description=f"usage: {prefix}support | Link to [our support server](https://rvlt.gg/ReTf1nbS)", run=support)
     print(commandList)
     print('Logged on as', bot.me)
     await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
