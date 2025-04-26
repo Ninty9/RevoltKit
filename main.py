@@ -63,7 +63,7 @@ async def remove(message: Message):
     arg = message.content.removeprefix(f"{prefix}remove ")
     if arg == "confirm":
         users.remove(user)
-        await message.channel.send(content="I don't even know who you are...")
+        await message.channel.send(content="Removed you from my database! Thanks for using my services ^^")
     else:
         await message.channel.send(content=f"Are you sure? type `{prefix}remove confirm` to confirm")
 
