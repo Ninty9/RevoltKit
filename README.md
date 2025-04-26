@@ -6,7 +6,7 @@ It can:
 - run [all the switch related commands that PluralKit can](https://pluralkit.me/commands/#switching-commands)
 
 ## Getting Started
-This guide is intended for people who are familiar with using PluralKit on Discord and want to use RevoltKit to proxy (and/or log switches) on Revolt the way they do on Discord.
+This guide is intended for people who are at least somewhat familiar with using PluralKit on Discord and want to use RevoltKit to proxy messages (and/or log switches) on Revolt the way they do on Discord.
 
 ### Adding RevoltKit to a Server
 Use [this link](https://app.revolt.chat/bot/01JQQH7BHF02HSVF8KYK1DVF8R) to invite the existing RevoltKit bot to your server. (Proxying and commands in group chats is not yet supported.)
@@ -20,34 +20,32 @@ Make a new Role for your server and grant it these permissions:
 Be sure to add the RevoltKit bot to that Role as well!
 
 ### Using RevoltKit
-Use `rk;setup` to get a tutorial and `rk;help` to see the list of commands.
+Use `rk;setup` to get a tutorial (this guide covers the same steps in more detail) and `rk;help` to see the list of commands.
 
-If you have members set to private or want to log switches using RevoltKit, you'll need to give RevoltKit your PluralKit auth token. To get your PluralKit token, use the command `pk;token` in Discord in a DM with the PluralKit bot or in a server that has PluralKit (if you run it in a server, it will still DM you the token for privacy reasons).
-_Warning: Be careful when running the command to authorize RevoltKit that you do so somewhere private, or else anyone who can see the command will also be able to access your private information._
+#### Setup
+Use `rk;id [SystemID or Discord ID]` to tell RevoltKit who you are. A `SystemId` is a five or six letter code that you can get by running the `pk;s id` command on Discord in a DM with the PluralKit bot or in a server that has PluralKit.
+
+_Brackets (`[]`) show where to fill in information, so for example if your system ID is `abcdef` then the command would be `rk;id abcdef`_
+
+#### Optional: Authorize RevoltKit
+If you have members set to private or want to log switches using RevoltKit, you will need to give RevoltKit your PluralKit auth token so it can access that information. (Otherwise, this step is optional.)
+
+To get your PluralKit token, use the command `pk;token` in Discord in a DM with the PluralKit bot or in a server that has PluralKit (if you run it in a server, it will still DM you the token for privacy reasons).
+
+Use `rk;auth [PluralKitToken]` to submit your token to RevoltKit.
+
+_Warning: Be careful when running the command to authorize RevoltKit that you do so somewhere private, or else anyone who can see the command will also be able to access your private information and edit your system data on PluralKit._
+
+#### Fetch Information From PluralKit
+Use `rk;fetch` to fetch your information from PluralKit. After this first time, every time you update your system members or proxy tags on PluralKit, you'll have to run it again to update it on RevoltKit. However, if you are using the `front` autoproxy mode (`rk;auto front`) you don't need to run it every time you log a switch on PluralKit.
 
 #### Optional: Set Up Autoproxy
-Use `rk;auto [off/front/latch]` to set your autoproxy preferences
+Use `rk;auto [off/front/latch]` to set your autoproxy preferences. 
+
+Autoproxy settings work the same way on RevoltKit as they do [on PluralKit](https://pluralkit.me/commands/#autoproxy-commands):
+- `rk;auto off  ` - Disables autoproxying for your system in the current server.
+- `rk;auto front` - Sets your system's autoproxy in this server to proxy the first member currently registered as front.
+- `rk;auto latch` - Sets your system's autoproxy in this server to proxy the last manually proxied member.
 
 #### Optional: Log Switches using RevoltKit
-RevoltKit can run all of the switch related commands that PluralKit can; [see more info on those here](https://pluralkit.me/commands/#switching-commands)
-
-### Running Your Own Bot
-This guide is intended for people with no experience making or running their own bots and want to run a fork of the bot from this repository.
-
-#### 1. Setup
-Follow the instructions [here](https://revolt.guide/docs/introduction/creating-a-bot-application) to set up a Revolt bot (and set the Name/Avatar/Description they way you want it), then copy the token for your bot
-
-#### 2. Hosting
-Hosting is where your bot's code will live and where it will run from. You can host it locally - on your own computer - or remotely - on a paid server somewhere else. If you host it locally, the bot will need to be running on your computer anytime it is active in the servers it is in. If you host it remotely, it will run on the server anytime the server is online (which is usually 24/7. Either way there may be issues with hosting that take the bot offline and need to be fixed.
-
-##### 2a. Hosting Locally
-Follow the instructions [here](https://revolt.guide/docs/introduction/installing-node.js-and-revolt.js) to install node.js and revolt.js on your computer.
-- [ ] check that this is actually part of setup for this bot
-- [ ] add more info on how to set this up
-
-##### 2a. Hosting Remotely
-- [ ] add options for where to host from
-- [ ] add more info on how to set this up
-
-#### 3. Adding Your Bot
-Follow the instructions [here](https://revolt.guide/docs/introduction/adding-your-bot-to-your-server) to get the bot's invite link, then see [Adding the Bot to a Server or Group](#Adding-the-Bot-to-a-Server-or-Group) above, but use your own link
+When [authorized to do so](#Optional:-Authorize-RevoltKit), RevoltKit can run all of the switch related commands that PluralKit can; [see more info on those here](https://pluralkit.me/commands/#switching-commands)
