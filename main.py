@@ -146,7 +146,8 @@ __**Required**__:
 - View Channel & Send Messages in whatever channel you want me to be in
                                
 **Recommended**:
-- Manage Roles (to have different member colors)""")
+- Manage Roles (to have different member colors)
+- Send Embeds & Upload Attachments (to proxy attachments)""")
 
 
 async def auth(message: Message):
