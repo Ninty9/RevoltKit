@@ -137,6 +137,18 @@ async def support(message: Message):
     # todo
     await message.channel.send(content="""You can find my support server [here](https://rvlt.gg/ReTf1nbS)!""")
 
+async def permcheck(message: Message):
+    # todo
+    await message.channel.send(content="""**Please note: I have no way of knowing whether I'm missing permissions!**
+This is due to an issue in [pyvolt](https://github.com/MCausc78/pyvolt); my developers can't fix this. Please manually check if I have the permissions I need!
+__**Required**__:
+- Manage Messages (to delete messages after I've proxied them)
+- Masquerade (to proxy at all)
+- View Channel & Send Messages in whatever channel you want me to be in
+                               
+**Recommended**:
+- Manage Roles (to have different member colors)""")
+
 
 async def auth(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
@@ -393,6 +405,7 @@ async def on_ready(_) -> None:
         shutil.copy(path, path.removesuffix(".txt") + "backup.txt")
     asyncio.create_task(save())
     Command(name="explain", description=f"usage: {prefix}explain | A short explanation of RevoltKit", run=explain)
+    Command(name="permcheck", description=f"usage: {prefix}permcheck | Check what permissions RevoltKit needs\n> Due to an error in [pyvolt](<https://github.com/MCausc78/pyvolt>)], RevoltKit cannot actually check what permissions it needs. For now, RevoltKit will tell you which permissions it *should* have, but server admins will need to manually check whether it actually has them.", run=permcheck)
     Command(name="setup", description=f"usage: {prefix}setup | A quick setup guide for RevoltKit", run=setup)
     Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="auth", description=f"usage: {prefix}auth [token] | Give RevoltKit authorization to view private information and log switches", run=auth)
