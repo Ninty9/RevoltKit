@@ -397,6 +397,7 @@ async def on_ready(_) -> None:
     Command(name="remove", description=f"usage: {prefix}remove | Make RevoltKit forget everything it knows about you", run=remove)
     Command(name="error", description=f"usage: {prefix}error | Toggle error messages (such as authorization issues)", run=error)
     Command(name="setup", description=f"usage: {prefix}setup | A quick setup guide for RevoltKit", run=setup)
+    Command(name="explain", description=f"usage: {prefix}explain | A short explanation of RevoltKit", run=explain)
     Command(name="auth", description=f"usage: {prefix}auth [token] | Give RevoltKit authorization to view private information and log switches", run=auth)
     Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
