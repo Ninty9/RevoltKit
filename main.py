@@ -120,7 +120,7 @@ async def case(message: Message):
 
 async def setup(message: Message):
     # todo
-    await message.channel.send(content="""Use `rk;id [SystemID or Discord ID]` to tell RevoltKit who you are!
+    await message.channel.send(content="""Use `rk;id [SystemID or Discord ID]` to tell RevoltKit who you are! (Note: To obtain your Discord account ID, you'll need to enable Discord's Developer Mode. This is *not* your Discord username!)
 (**OPTIONAL** if your **members, proxies, and front** are **public!**) Use `rk;auth [PluralKitToken]` if you've got private information, or RevoltKit won't be able to proxy properly.
 Finally, to complete setup, use `rk;fetch`! After this first time, every time you update your information on PluralKit (such as proxy tags or members), you'll have to run it again to update it on RevoltKit. It doesn't update automatically.""")
 
