@@ -533,6 +533,8 @@ Use {prefix}auth [token] to set your token or {prefix}error off to turn messages
 
     system = await client.get_system(proxier.system.id)
     tag = system.tag
+    if tag is None:
+        tag = ""
     cutoffpostfix = "..."
     reqlen = 32 - (len(tag)+len(cutoffpostfix)+1)
     if len(name) > reqlen:
