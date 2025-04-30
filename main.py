@@ -358,8 +358,8 @@ async def switch_out(message: Message):
     try:
         await client.new_switch()
         await message.channel.send(content=":white_check_mark: Successfully switched out!")
-    except:
-        await message.channel.send(content=":x: There was an error while switching.")
+    except Exception as e:
+        await message.channel.send(content=":x: There was an error while switching:\n - " + str(e))
 
 
 async def switch(message: Message):
