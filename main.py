@@ -455,8 +455,10 @@ async def on_message(event: MessageCreateEvent):
 
     # todo: case sensitivity
     # add a command to toggle it and if its true just convert the message to lowercase (only when checking proxy) and then als
-
-    await send(message)
+    try:
+        await send(message)
+    except Exception as e:
+        await message.channel.send(content="**Encountered an error while sending message:**\n - " + str(e.__class__) + ": " + str(e) + "\nThis could either be a permissions issue or an issue with this bot.")
 
 async def send(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
@@ -520,7 +522,7 @@ async def send(message: Message):
 
     except Unauthorized:
         if user['error']:
-            await message.channel.send(content=f""":Error: I'm not authorised to access this member or your current fronters!
+            await message.channel.send(content=f""":warning: I'm not authorised to access this member or your current fronters!
 Use {prefix}auth [token] to set your token or {prefix}error off to turn messages like this off.""")
 
     if proxier is None:
