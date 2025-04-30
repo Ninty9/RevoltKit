@@ -383,6 +383,7 @@ async def switch(message: Message):
         await client.new_switch(*mems)
     except Exception as e:
         await message.channel.send(content=":x: There was an error while switching:\n - " + str(e))
+        return
     #done?: words
     await message.channel.send(content=":white_check_mark: Successfully switched!")
     
