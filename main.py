@@ -381,8 +381,8 @@ async def switch(message: Message):
             mems.append(pluralkit.MemberId(uuid=mem['id']))
     try:
         await client.new_switch(*mems)
-    except:
-        await message.channel.send(content=":x: There was an error while switching.")
+    except Exception as e:
+        await message.channel.send(content=":x: There was an error while switching:\n - " + str(e))
     #done?: words
     await message.channel.send(content=":white_check_mark: Successfully switched!")
     
