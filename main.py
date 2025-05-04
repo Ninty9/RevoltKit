@@ -1,4 +1,5 @@
 ﻿import asyncio
+import datetime
 import json
 import os
 import shlex
@@ -9,6 +10,8 @@ import pluralkit
 import pyvolt
 from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
 from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus
+import emoji
+from setuptools.command.alias import alias
 
 path = 'users.txt'
 users = list()
@@ -403,7 +406,7 @@ async def on_ready(_) -> None:
             users = json.loads(file.read())
     except:
         print("failure loading data, making backup of file")
-        shutil.copy(path, path.removesuffix(".txt") + "backup.txt")
+        shutil.copy(path, path.removesuffix(".txt") + "backup" + str(datetime.datetime.date(datetime.datetime.now())) + ".txt")
     asyncio.create_task(save())
     Command(name="explain", description=f"usage: {prefix}explain | A short explanation of RevoltKit", run=explain)
     Command(name="permcheck", description=f"usage: {prefix}permcheck | Check what permissions RevoltKit needs\n> RevoltKit cannot actually check what permissions it needs due to issues outside of our control. For now, RevoltKit will tell you which permissions it *should* have, but server admins will need to manually check whether it actually has them.", run=permcheck)
@@ -500,6 +503,35 @@ async def send(message: Message):
                         content = remove_suffix_ci(content, suf)
                     break
 
+        if proxier is None:
+            check = message.content
+            newcheck = emoji.emojize(check, language='alias')
+            if check != newcheck:
+                check = newcheck
+                if not user['case']:
+                    check = check.lower()
+                for member in user['members']:
+                    if proxier is not None:
+                        break
+                    for proxy in member['proxies']:
+                        pre = proxy['prefix']
+                        suf = proxy['suffix']
+
+                        if not user['case']:
+                            if pre is not None:
+                                pre = pre.lower()
+                            if suf is not None:
+                                suf = suf.lower()
+                        pt = ProxyTag(pre, suf)
+                        if pt(check):
+                            user['latch'] = True
+                            proxier = await client.get_member(member['id'])
+                            user['members'].insert(0, user['members'].pop(user['members'].index(member)))
+                            if pt.prefix is not None:
+                                content = remove_prefix_ci(emoji.emojize(content, language='alias'), pre)
+                            if pt.suffix is not None:
+                                content = remove_suffix_ci(emoji.emojize(content, language='alias'), suf)
+                            break
 
         if proxier is None:
             if type(message.channel) is not pyvolt.TextChannel:
