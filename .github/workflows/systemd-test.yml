@@ -1,0 +1,19 @@
+name: remote ssh command
+on: 
+  push:
+    branches:
+      - test
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ninty
+          port: ${{ secrets.PORT }}
+          passphrase: ${{ secrets.PASSPHRASE }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: /home/ninty/testvolt.sh
