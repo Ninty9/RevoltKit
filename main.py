@@ -248,8 +248,8 @@ async def help_command(message: Message):
         if command.shorthand:
             continue
         help_message += "**" + command.name + "**\n" + command.description + "\n"
-        if len(help_message) > 2000:
-            await message.channel.send(content=help_message.removesuffix("\n"))
+        if command.description.endswith("\n") or len(help_message) > 1500:
+            await message.channel.send(content=help_message.removesuffix("\n").removesuffix("\n"))
             help_message = ""
     if help_message != "":
         await message.channel.send(content=help_message.removesuffix("\n"))
@@ -414,7 +414,7 @@ async def on_ready(_) -> None:
     Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="auth", description=f"usage: {prefix}auth [token] | Give RevoltKit authorization to view private information and log switches", run=auth)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
-    Command(name="support", description=f"usage: {prefix}support | Link to [our support server](https://rvlt.gg/ReTf1nbS)", run=support)
+    Command(name="support", description=f"usage: {prefix}support | Link to [our support server](https://rvlt.gg/ReTf1nbS)\n", run=support)
     Command(name="proxy", description=f"usage: {prefix}proxy [on/off] | Turn proxying on or off globally", run=proxy)
     Command(name="remove", description=f"usage: {prefix}remove | Make RevoltKit forget everything it knows about you", run=remove)
     Command(name="error", description=f"usage: {prefix}error | Toggle error messages (such as authorization issues)", run=error)
