@@ -2,7 +2,7 @@ name: remote ssh command
 on: 
   push:
     branches:
-      - main
+      - test
 jobs:
   build:
     name: Build
@@ -16,4 +16,4 @@ jobs:
           port: ${{ secrets.PORT }}
           passphrase: ${{ secrets.PASSPHRASE }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          script: /home/ninty/revolt.sh
+          script: /home/ninty/testvolt.sh
