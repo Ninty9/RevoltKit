@@ -436,7 +436,6 @@ async def on_ready(_) -> None:
     Command(name="sw delete", description="switch shorthand", run=switch_delete, shorthand=True)
     Command(name="sw", description="switch shorthand", run=switch, shorthand=True)
 
-    print(commandList)
     print('Logged on as', bot.me)
     await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
 
