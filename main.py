@@ -4,6 +4,7 @@ import json
 import os
 import shlex
 import shutil
+from asyncio import sleep
 from datetime import timedelta
 
 import pluralkit
@@ -251,6 +252,7 @@ async def help_command(message: Message):
         if command.description.endswith("\n") or len(help_message) > 1500:
             await message.channel.send(content=help_message.removesuffix("\n").removesuffix("\n"))
             help_message = ""
+            await sleep(0.5)
     if help_message != "":
         await message.channel.send(content=help_message.removesuffix("\n"))
 
