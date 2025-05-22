@@ -4,6 +4,7 @@ import json
 import os
 import shlex
 import shutil
+import traceback
 from asyncio import sleep
 from datetime import timedelta
 
@@ -23,7 +24,7 @@ self_bot = False
 token = os.getenv("TOKEN")
 
 bot = Client(token=token, bot=True)
-
+help_messages = [""]
 
 class Command:
     def __init__(self, name, description, run, shorthand = False):
@@ -244,17 +245,9 @@ async def auto(message: Message):
 
 
 async def help_command(message: Message):
-    help_message = ""
-    for command in commandList:
-        if command.shorthand:
-            continue
-        help_message += "**" + command.name + "**\n" + command.description + "\n"
-        if command.description.endswith("\n") or len(help_message) > 1500:
-            await message.channel.send(content=help_message.removesuffix("\n").removesuffix("\n"))
-            help_message = ""
-            await sleep(0.5)
-    if help_message != "":
-        await message.channel.send(content=help_message.removesuffix("\n"))
+    for m in help_messages:
+        await message.channel.send(content=m.removesuffix("\n"))
+        await sleep(0.5)
 
 async def switch_move(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
@@ -436,6 +429,15 @@ async def on_ready(_) -> None:
     Command(name="sw delete", description="switch shorthand", run=switch_delete, shorthand=True)
     Command(name="sw", description="switch shorthand", run=switch, shorthand=True)
 
+    index = 0
+    for command in commandList:
+        if command.shorthand:
+            continue
+        help_messages[index] += "**" + command.name + "**\n" + command.description + "\n"
+        if command.description.endswith("\n") or len(help_messages[index]) > 1500:
+            index += 1
+            help_messages.append("")
+            
     print('Logged on as', bot.me)
     await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
 
@@ -465,6 +467,7 @@ async def on_message(event: MessageCreateEvent):
     try:
         await send(message)
     except Exception as e:
+        traceback.print_exc()
         await message.channel.send(content="**Encountered an error while sending message:**\n - " + str(e.__class__) + ": " + str(e) + "\nThis could either be a permissions issue or an issue with this bot.")
 
 async def send(message: Message):
@@ -602,6 +605,8 @@ Use {prefix}auth [token] to set your token or {prefix}error off to turn messages
             avatar = (await client.get_system(user['did'])).avatar_url
     except Unauthorized:
         _ = ""
+    if avatar is None:
+        avatar = "https://as2.ftcdn.net/jpg/00/64/67/63/1000_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.webp"
     files = [
         (asset.filename,await asset.read())
         for asset in message.attachments
