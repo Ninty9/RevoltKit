@@ -437,7 +437,7 @@ async def on_ready(_) -> None:
         if command.description.endswith("\n") or len(help_messages[index]) > 1500:
             index += 1
             help_messages.append("")
-            
+
     print('Logged on as', bot.me)
     await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
 
