@@ -44,7 +44,7 @@ async def proxy(message: Message):
     match arg:
         case "on":
             user['proxy'] = True
-            await message.channel.send(content="Messages now be proxied!")
+            await message.channel.send(content="Messages will now be proxied again!")
         case "off":
             user['proxy'] = False
             await message.channel.send(content="Messages will no longer be proxied. ):")
@@ -131,12 +131,12 @@ Finally, to complete setup, use `rk;fetch`! After this first time, every time yo
 
 async def explain(message: Message):
     # todo
-    await message.channel.send(content="""Hi, I'm RevoltKit! I'm a bot that lets you use the PluralKit API to proxy as yourself in Revolt, using Revolt's Masquerade functionality! ^^
+    await message.channel.send(content="""Hi, I'm RevoltKit! I'm a bot that lets you use the PluralKit API to proxy as yourself in Stoat, using Stoat's Masquerade functionality! ^^
 Both PluralKit and I function very similarly; we both check your messages to see if they match a pattern you've set, and re-send the message with the associated name, profile picture and color!
 
-This is useful for folk who're multiple people in one body (aka systems). people who wanna roleplay without the hassle of swapping accounts all the time, or... any other reason you'd wanna have multiple identities without multiple accounts, really.
+This is useful for folk who're multiple people in one body (such as systems or plural folk), people who wanna roleplay without the hassle of swapping accounts all the time, or... any other reason you'd wanna have multiple identities without multiple accounts, really.
 
-Due to Revolt limitations, proxied messages will show up with the `[BRIDGE]` tag; there's still definitely a person behind it, though! ^^;""")
+Due to Stoat limitations, proxied messages will show up with the `[BRIDGE]` tag; there's still definitely a person behind it, though! ^^;""")
     
 async def support(message: Message):
     # todo
@@ -172,7 +172,7 @@ async def auth(message: Message):
 async def id_command(message: Message):
     arg = message.content.removeprefix(f"{prefix}id ")
     if arg == f"{prefix}id":
-        await message.channel.send(content=f"You need to add an id, {prefix}id [id]")
+        await message.channel.send(content=f"Missing argument. {prefix}id [id]")
         return
     user = next((x for x in users if x['rid'] == message.author.id), None)
     if user is None:
@@ -202,9 +202,9 @@ async def fetch(message: Message):
                 error = True
     except Exception as e:
         if user['error']:
-            await message.channel.send(content=f"""There was an issue when getting your member list, I won't be able to proxy any messages!
+            await message.channel.send(content=f"""There was an issue getting your member list, I won't be able to proxy any messages!
                 Please use `{prefix}auth [token]` if you want me to be able to access your privated member list, or `{prefix}error off` to turn messages like these off.
-                **If you have your token set and are still seeing this please try to contact support** (`rk;support`)**, here is your error message:\n"""+str(e))
+                **If you have your token set and are still seeing this please contact support** (`rk;support`)**, here is your error message:\n"""+str(e))
         return
     
     user['members'] = members
@@ -420,7 +420,7 @@ async def on_ready(_) -> None:
     Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
     Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 1d 6h 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
-    Command(name="autoproxy", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Revolt*", run=auto)
+    Command(name="autoproxy", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Stoat*", run=auto)
     Command(name="auto", description="ap shorthand", run=auto, shorthand=True)
     Command(name="ap", description="ap shorthand", run=auto, shorthand=True)
     Command(name="sw out", description=f"sw out", run=switch_out, shorthand=True)
@@ -468,7 +468,7 @@ async def on_message(event: MessageCreateEvent):
         await send(message)
     except Exception as e:
         traceback.print_exc()
-        await message.channel.send(content="**Encountered an error while sending message:**\n - " + str(e.__class__) + ": " + str(e) + "\nThis could either be a permissions issue or an issue with this bot.")
+        await message.channel.send(content="**Encountered an error while sending message:**\n - " + str(e.__class__) + ": " + str(e) + "\nThis could either be a permissions issue or an issue with this bot. Please check RevoltKit's permissions and send this to support.")
 
 async def send(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
