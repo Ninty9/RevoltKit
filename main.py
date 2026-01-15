@@ -217,7 +217,9 @@ async def auto(message: Message):
     if user is None:
         await message.channel.send(content=f":x: I don't have you in my database; please run {prefix}setup.")
         return
-    if message.content.startswith(f"{prefix}auto"):
+    if message.content.startswith(f"{prefix}autoproxy"):
+        arg = message.content.removeprefix(f"{prefix}autoproxy ")
+    elif message.content.startswith(f"{prefix}auto"):
         arg = message.content.removeprefix(f"{prefix}auto ")
     elif message.content.startswith(f"{prefix}ap"):
         arg = message.content.removeprefix(f"{prefix}ap ")
