@@ -445,6 +445,15 @@ async def on_ready(_) -> None:
             if command.shorthand:
                 continue
             help_messages[index] += "**" + command.name + "**\n" + command.description + "\n"
+            shorthands = ""
+            for command2 in commandList:
+                if not command2.shorthand:
+                    continue
+                if command2.run != command.run:
+                    continue
+                shorthands += command2.name + ", "
+            if shorthands != "":
+                help_messages[index] += "Shorthands: " + shorthands.removesuffix(", ") + "\n"
             if command.description.endswith("\n") or len(help_messages[index]) > 1500:
                 index += 1
                 help_messages.append("")
