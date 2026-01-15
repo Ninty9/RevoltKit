@@ -471,11 +471,11 @@ async def on_message(event: MessageCreateEvent):
         await send(message)
     except pyvolt.errors.Forbidden as f:
         traceback.print_exc()
-        await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission)
+        await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission + "\nUse rk;permcheck to see which permissions the bot needs, if this doesn't solve the issue please send this to support.")
     except Exception as e:
         await message.channel.send(
             content="**Encountered an unhandled error while sending message:**\n - " + str(e.__class__) + ": " + str(
-                e) + "\nThis could either be a permissions issue or an issue with this bot.")
+                e) + "\nThis could either be a permissions issue or an issue with this bot. Please check RevoltKit's permissions (rk;permcheck) and send this to support.")
 
 
 async def send(message: Message):
