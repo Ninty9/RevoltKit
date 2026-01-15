@@ -11,8 +11,9 @@ from datetime import timedelta
 import pluralkit
 import pyvolt
 from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
-from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus
+from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden
 import emoji
+from pyvolt.ext.commands import MissingPermissions
 from setuptools.command.alias import alias
 
 path = 'users.txt'
@@ -429,14 +430,16 @@ async def on_ready(_) -> None:
     Command(name="sw delete", description="switch shorthand", run=switch_delete, shorthand=True)
     Command(name="sw", description="switch shorthand", run=switch, shorthand=True)
 
-    index = 0
-    for command in commandList:
-        if command.shorthand:
-            continue
-        help_messages[index] += "**" + command.name + "**\n" + command.description + "\n"
-        if command.description.endswith("\n") or len(help_messages[index]) > 1500:
-            index += 1
-            help_messages.append("")
+
+    if help_messages == [""]:
+        index = 0
+        for command in commandList:
+            if command.shorthand:
+                continue
+            help_messages[index] += "**" + command.name + "**\n" + command.description + "\n"
+            if command.description.endswith("\n") or len(help_messages[index]) > 1500:
+                index += 1
+                help_messages.append("")
 
     print('Logged on as', bot.me)
     await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
@@ -466,9 +469,14 @@ async def on_message(event: MessageCreateEvent):
     # add a command to toggle it and if its true just convert the message to lowercase (only when checking proxy) and then als
     try:
         await send(message)
-    except Exception as e:
+    except pyvolt.errors.Forbidden as f:
         traceback.print_exc()
-        await message.channel.send(content="**Encountered an error while sending message:**\n - " + str(e.__class__) + ": " + str(e) + "\nThis could either be a permissions issue or an issue with this bot.")
+        await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission)
+    except Exception as e:
+        await message.channel.send(
+            content="**Encountered an unhandled error while sending message:**\n - " + str(e.__class__) + ": " + str(
+                e) + "\nThis could either be a permissions issue or an issue with this bot.")
+
 
 async def send(message: Message):
     user = next((x for x in users if x['rid'] == message.author.id), None)
