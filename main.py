@@ -217,7 +217,13 @@ async def auto(message: Message):
     if user is None:
         await message.channel.send(content=f":x: I don't have you in my database; please run {prefix}setup.")
         return
-    arg = message.content.removeprefix(f"{prefix}auto ")
+    if message.content.startswith(f"{prefix}auto"):
+        arg = message.content.removeprefix(f"{prefix}auto ")
+    elif message.content.startswith(f"{prefix}ap"):
+        arg = message.content.removeprefix(f"{prefix}ap ")
+    else:
+        await message.channel.send(content=f":x: Something went wrong while trying to run auto command.")
+        return
     if type(message.channel) is not pyvolt.TextChannel:
         sid = message.channel.id
     else:
