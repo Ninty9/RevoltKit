@@ -501,17 +501,24 @@ async def send(message: Message):
         return
     if not user['proxy']:
         return
+    
+    if type(message.channel) is not pyvolt.TextChannel:
+        sid = message.channel.id
+    else:
+        sid = message.channel.server_id
 
+    if message.content.startswith("\\\\"):
+        user['latch'] = False
+        auto = next((x for x in user['auto'] if x['server'] == sid), None)
+        if auto is not None and auto['mode'] == 'latch':
+            auto['member'] = None
+        return
     if message.content.startswith("\\"):
         user['latch'] = False
         return
     client = pluralkit.Client(token=user['token'], user_agent="ninty0808@gmail.com")
     proxier = None
     content = message.content
-    if type(message.channel) is not pyvolt.TextChannel:
-        sid = message.channel.id
-    else:
-        sid = message.channel.server_id
 
     try:
         for member in user['members']:
