@@ -248,7 +248,7 @@ async def auto(message: Message):
             await message.channel.send(content="Will autoproxy with your front in this server.")
         case AutoproxyMode.LATCH.value:
             user['auto'].append({'mode': AutoproxyMode.LATCH.value, 'server': sid})
-            await message.channel.send(content="Will autoproxy with latch in this server. (note: current latch is global)")
+            await message.channel.send(content="Will autoproxy with latch in this server.")
         case _:
             await message.channel.send(content=f"Incorrect argument, use {prefix}auto [off/front/latch]")
 
@@ -429,7 +429,7 @@ async def on_ready(_) -> None:
     Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
     Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 1d 6h 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
-    Command(name="autoproxy", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Stoat*", run=auto)
+    Command(name="autoproxy", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last in that server", run=auto)
     Command(name="auto", description="ap shorthand", run=auto, shorthand=True)
     Command(name="ap", description="ap shorthand", run=auto, shorthand=True)
     Command(name="sw out", description=f"sw out", run=switch_out, shorthand=True)
