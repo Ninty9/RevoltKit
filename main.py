@@ -508,6 +508,10 @@ async def send(message: Message):
     client = pluralkit.Client(token=user['token'], user_agent="ninty0808@gmail.com")
     proxier = None
     content = message.content
+    if type(message.channel) is not pyvolt.TextChannel:
+        sid = message.channel.id
+    else:
+        sid = message.channel.server_id
 
     try:
         for member in user['members']:
@@ -527,7 +531,9 @@ async def send(message: Message):
                 if pt(check):
                     user['latch'] = True
                     proxier = await client.get_member(member['id'])
-                    user['members'].insert(0, user['members'].pop(user['members'].index(member)))
+                    auto = next((x for x in user['auto'] if x['server'] == sid), None)
+                    if auto is not None and auto['mode'] == 'latch':
+                        auto['member'] = member['id']
                     if pt.prefix is not None:
                         content = remove_prefix_ci(content, pre)
                     if pt.suffix is not None:
@@ -557,7 +563,9 @@ async def send(message: Message):
                         if pt(check):
                             user['latch'] = True
                             proxier = await client.get_member(member['id'])
-                            user['members'].insert(0, user['members'].pop(user['members'].index(member)))
+                            auto = next((x for x in user['auto'] if x['server'] == sid), None)
+                            if auto is not None and auto['mode'] == 'latch':
+                                auto['member'] = member['id']
                             if pt.prefix is not None:
                                 content = remove_prefix_ci(emoji.emojize(content, language='alias'), pre)
                             if pt.suffix is not None:
@@ -565,10 +573,6 @@ async def send(message: Message):
                             break
 
         if proxier is None:
-            if type(message.channel) is not pyvolt.TextChannel:
-                sid = message.channel.id
-            else:
-                sid = message.channel.server_id
             auto = next((x for x in user['auto'] if x['server'] == sid), None)
             if auto is None:
                 return
@@ -580,9 +584,8 @@ async def send(message: Message):
                         proxier = member
                         break
                 case AutoproxyMode.LATCH.value:
-                    for member in user['members']:
-                        proxier = await client.get_member(member['id'])
-                        break
+                    if auto.get('member') is not None:
+                        proxier = await client.get_member(auto['member'])
 
     except Unauthorized:
         if user['error']:
