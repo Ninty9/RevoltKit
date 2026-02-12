@@ -230,7 +230,7 @@ async def auto(message: Message):
         sid = message.channel.id
     else:
         sid = message.channel.server_id
-        autoproxy = next((x for x in user['auto'] if x['server'] == sid), None)
+    autoproxy = next((x for x in user['auto'] if x['server'] == sid), None)
     if arg == f"{prefix}auto":
         if autoproxy is None:
             user['auto'].append({'mode': AutoproxyMode.OFF.value, 'server':sid})
