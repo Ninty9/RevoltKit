@@ -9,7 +9,7 @@ It can:
 This guide is intended for people who are at least somewhat familiar with using PluralKit on Discord and want to use RevoltKit to proxy messages (and/or log switches) on Revolt the way they do on Discord.
 
 ### Adding RevoltKit to a Server
-Use [this link](https://app.revolt.chat/bot/01JQQH7BHF02HSVF8KYK1DVF8R) to invite the existing RevoltKit bot to your server. (Proxying and commands in group chats is not yet supported.)
+Use [this link](https://stoat.chat/bot/01JQQH7BHF02HSVF8KYK1DVF8R) to invite the existing RevoltKit bot to your server. (Proxying and commands in group chats is not yet supported.)
 
 #### Set Up Permissions
 Make a new Role for your server and grant it these permissions:
