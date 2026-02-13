@@ -12,6 +12,7 @@ usersbackup.txt
 
 # Distribution / packaging
 .Python
+bin
 build/
 develop-eggs/
 dist/
@@ -20,6 +21,7 @@ eggs/
 .eggs/
 lib/
 lib64/
+lib64
 parts/
 sdist/
 var/
@@ -132,6 +134,7 @@ ENV/
 env.bak/
 venv.bak/
 bot-env/
+pyvenv.cfg
 
 # Spyder project settings
 .spyderproject
