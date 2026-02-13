@@ -141,7 +141,7 @@ Due to Stoat limitations, proxied messages will show up with the `[BRIDGE]` tag;
     
 async def support(message: Message):
     # todo
-    await message.channel.send(content="""You can find my support server [here](https://rvlt.gg/ReTf1nbS)!""")
+    await message.channel.send(content="""You can find my support server [here](https://stt.gg/ReTf1nbS)!""")
 
 async def permcheck(message: Message):
     # todo
