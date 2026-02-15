@@ -23,8 +23,11 @@ prefix = os.getenv("PREFIX", "rk;")
 self_bot = False
 
 token = os.getenv("TOKEN")
+api_base = os.getenv("STOAT_API_BASE") or None
+cdn_base = os.getenv("STOAT_CDN_BASE") or None
+ws_base = os.getenv("STOAT_WS_BASE") or None
 
-bot = Client(token=token, bot=True)
+bot = Client(token=token, bot=True, http_base=api_base, websocket_base=ws_base, cdn_base=cdn_base)
 help_messages = [""]
 
 class Command:
