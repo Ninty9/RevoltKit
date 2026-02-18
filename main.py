@@ -9,11 +9,11 @@ from asyncio import sleep
 from datetime import timedelta
 
 import pluralkit
-import pyvolt
+import stoat
 from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
-from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden
+from stoat import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden
 import emoji
-from pyvolt.ext.commands import MissingPermissions
+from stoat.ext.commands import MissingPermissions
 from setuptools.command.alias import alias
 
 path = 'users.txt'
@@ -24,7 +24,7 @@ self_bot = False
 
 token = os.getenv("TOKEN")
 
-bot = Client(token=token, bot=True)
+bot = Client()
 help_messages = [""]
 
 class Command:
@@ -226,7 +226,7 @@ async def auto(message: Message):
     else:
         await message.channel.send(content=f"❌ Something went wrong while trying to run auto command.")
         return
-    if type(message.channel) is not pyvolt.TextChannel:
+    if type(message.channel) is not stoat.TextChannel:
         sid = message.channel.id
     else:
         sid = message.channel.server_id
@@ -399,7 +399,7 @@ async def switch(message: Message):
 commandList: list[Command] = list()
 
 @bot.on(ReadyEvent)
-async def on_ready(_) -> None:
+async def on_ready(event, /) -> None:
     global users
     if not os.path.isfile(path):
         with open(path, 'w') as file:
@@ -459,11 +459,11 @@ async def on_ready(_) -> None:
                 help_messages.append("")
 
     print('Logged on as', bot.me)
-    await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
+    await bot.me.edit(status=stoat.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=stoat.Presence.online))
 
 
 @bot.on(MessageCreateEvent)
-async def on_message(event: MessageCreateEvent):
+async def on_message(event: MessageCreateEvent, /):
     message = event.message
 
     # don't respond to ourselves/others
@@ -486,7 +486,7 @@ async def on_message(event: MessageCreateEvent):
     # add a command to toggle it and if its true just convert the message to lowercase (only when checking proxy) and then als
     try:
         await send(message)
-    except pyvolt.errors.Forbidden as f:
+    except stoat.errors.Forbidden as f:
         traceback.print_exc()
         await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission + "\nUse rk;permcheck to see which permissions the bot needs, if this doesn't solve the issue please send this to support.")
     except Exception as e:
@@ -565,7 +565,7 @@ async def send(message: Message):
                             break
 
         if proxier is None:
-            if type(message.channel) is not pyvolt.TextChannel:
+            if type(message.channel) is not stoat.TextChannel:
                 sid = message.channel.id
             else:
                 sid = message.channel.server_id
@@ -598,13 +598,13 @@ Use {prefix}auth [token] to set your token or {prefix}error off to turn messages
 
     manage = True
     try:
-        if type(message.channel) is not pyvolt.GroupChannel:
+        if type(message.channel) is not stoat.GroupChannel:
             await bot.http.edit_role(server=message.channel.server.id, role="00000000000000000000000000")
         else:
             manage = False
-    except pyvolt.Forbidden:
+    except stoat.Forbidden:
         manage = False
-    except pyvolt.NotFound:
+    except stoat.NotFound:
         _ = ""
     color = None
     if proxier.color is not None and manage:
@@ -639,7 +639,7 @@ Use {prefix}auth [token] to set your token or {prefix}error off to turn messages
     ]
     await message.channel.send(
         content=content,
-        masquerade=pyvolt.MessageMasquerade(name=name[:32], avatar=avatar, color=color),
+        masquerade=stoat.MessageMasquerade(name=name[:32], avatar=avatar, color=color),
         replies=message.replies,
         attachments=files,
         silent=message.is_silent()
@@ -665,4 +665,6 @@ async def save():
             file.write(json.dumps(users))
 
 
-bot.run()
+
+
+bot.run(token, bot=True)
