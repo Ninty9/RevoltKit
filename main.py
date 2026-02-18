@@ -24,7 +24,7 @@ self_bot = False
 
 token = os.getenv("TOKEN")
 
-bot = Client(token=token, bot=True)
+bot = Client()
 help_messages = [""]
 
 class Command:
@@ -399,7 +399,7 @@ async def switch(message: Message):
 commandList: list[Command] = list()
 
 @bot.on(ReadyEvent)
-async def on_ready(_) -> None:
+async def on_ready(event, /) -> None:
     global users
     if not os.path.isfile(path):
         with open(path, 'w') as file:
@@ -463,7 +463,7 @@ async def on_ready(_) -> None:
 
 
 @bot.on(MessageCreateEvent)
-async def on_message(event: MessageCreateEvent):
+async def on_message(event: MessageCreateEvent, /):
     message = event.message
 
     # don't respond to ourselves/others
@@ -665,4 +665,6 @@ async def save():
             file.write(json.dumps(users))
 
 
-bot.run()
+
+
+bot.run(token, bot=True)
