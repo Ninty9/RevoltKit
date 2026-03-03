@@ -502,7 +502,7 @@ async def send(message: Message):
     if not user['proxy']:
         return
 
-    if type(message.channel) is not pyvolt.TextChannel:
+    if type(message.channel) is not stoat.TextChannel:
         sid = message.channel.id
     else:
         sid = message.channel.server_id
