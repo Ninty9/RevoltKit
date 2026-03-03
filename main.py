@@ -11,8 +11,9 @@ from datetime import timedelta
 import pluralkit
 import stoat
 from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
-from stoat import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden
+from stoat import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden, Member
 import emoji
+from pluralkit import Member as PkMember
 from stoat.ext.commands import MissingPermissions
 from setuptools.command.alias import alias
 
@@ -493,6 +494,7 @@ async def on_message(event: MessageCreateEvent, /):
         traceback.print_exc()
         await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission + "\nUse rk;permcheck to see which permissions the bot needs, if this doesn't solve the issue please send this to support.")
     except Exception as e:
+        traceback.print_exc()
         await message.channel.send(
             content="**Encountered an unhandled error while sending message:**\n - " + str(e.__class__) + ": " + str(
                 e) + "\nThis could either be a permissions issue or an issue with this bot. Please check RevoltKit's permissions (rk;permcheck) and send this to support.")
@@ -520,7 +522,7 @@ async def send(message: Message):
         user['latch'] = False
         return
     client = pluralkit.Client(token=user['token'], user_agent="ninty0808@gmail.com")
-    proxier = None
+    proxier: PkMember = None
     content = message.content
 
     try:
@@ -544,6 +546,8 @@ async def send(message: Message):
                     auto = next((x for x in user['auto'] if x['server'] == sid), None)
                     if auto is not None and auto['mode'] == 'latch':
                         auto['member'] = member['id']
+                    if proxier.keep_proxy:
+                        break
                     if pt.prefix is not None:
                         content = remove_prefix_ci(content, pre)
                     if pt.suffix is not None:
@@ -576,6 +580,8 @@ async def send(message: Message):
                             auto = next((x for x in user['auto'] if x['server'] == sid), None)
                             if auto is not None and auto['mode'] == 'latch':
                                 auto['member'] = member['id']
+                            if proxier.keep_proxy:
+                                break
                             if pt.prefix is not None:
                                 content = remove_prefix_ci(emoji.emojize(content, language='alias'), pre)
                             if pt.suffix is not None:
@@ -596,6 +602,18 @@ async def send(message: Message):
                 case AutoproxyMode.LATCH.value:
                     if auto.get('member') is not None:
                         proxier = await client.get_member(auto['member'])
+            if proxier is not None and proxier.keep_proxy:
+                mem = next((x for x in user['members'] if x['id'] == proxier.id.uuid), None)
+                if mem is None:
+                    print(user['members'])
+                else:
+                    proxies = next((x for x in mem['proxies']), None)
+                    if proxies is not None:
+                        if proxies['prefix'] is not None:
+                            content = proxies['prefix'] + content
+                        if proxies['suffix'] is not None:
+                            content = content + proxies['suffix']
+
 
     except Unauthorized:
         if user['error']:
