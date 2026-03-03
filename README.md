@@ -57,7 +57,7 @@ Autoproxy settings work the same way on RevoltKit as they do [on PluralKit](http
 - `rk;auto latch` - Sets your system's autoproxy in this server to proxy the last manually proxied member.
 
 ##### RevoltKit's Latch Mode
-Unlike PluralKit where the last member to proxy in a specific server will be used again when posting in the same server, RevoltKit's `latch` setting currently latches across all of Revolt and has no timeout. You will still need to turn it on in each server, however once the mode is set to `latch` the last proxied member for that mode is tracked across all servers.
+~~Unlike PluralKit where the last member to proxy in a specific server will be used again when posting in the same server, RevoltKit's `latch` setting currently latches across all of Revolt and has no timeout.~~ RevoltKit's latch setting is similar to PluralKit's. You will need to turn it on in each server you want the latch to work in, and it will track per-server.
 
 #### Optional: Log Switches using RevoltKit
 When [authorized to do so](#Optional:Authorize-RevoltKit), RevoltKit can run all of the switch related commands that PluralKit can; [see more info on those here](https://pluralkit.me/commands/#switching-commands). Please note that while all the switch commands are supported, switch flags (such as the `-append` flag in the command `rk;sw edit -append [Name]`) are not supported yet.
