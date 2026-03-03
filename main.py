@@ -9,11 +9,11 @@ from asyncio import sleep
 from datetime import timedelta
 
 import pluralkit
-import pyvolt
+import stoat
 from pluralkit import AutoproxyMode, Unauthorized, ProxyTag
-from pyvolt import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden
+from stoat import ReadyEvent, MessageCreateEvent, Message, Client, RelationshipStatus, HTTPException, Forbidden
 import emoji
-from pyvolt.ext.commands import MissingPermissions
+from stoat.ext.commands import MissingPermissions
 from setuptools.command.alias import alias
 
 path = 'users.txt'
@@ -27,7 +27,7 @@ api_base = os.getenv("STOAT_API_BASE") or None
 cdn_base = os.getenv("STOAT_CDN_BASE") or None
 ws_base = os.getenv("STOAT_WS_BASE") or None
 
-bot = Client(token=token, bot=True, http_base=api_base, websocket_base=ws_base, cdn_base=cdn_base)
+bot = Client(http_base=api_base, websocket_base=ws_base, cdn_base=cdn_base)
 help_messages = [""]
 
 class Command:
@@ -229,11 +229,11 @@ async def auto(message: Message):
     else:
         await message.channel.send(content=f"❌ Something went wrong while trying to run auto command.")
         return
-    if type(message.channel) is not pyvolt.TextChannel:
+    if type(message.channel) is not stoat.TextChannel:
         sid = message.channel.id
     else:
         sid = message.channel.server_id
-        autoproxy = next((x for x in user['auto'] if x['server'] == sid), None)
+    autoproxy = next((x for x in user['auto'] if x['server'] == sid), None)
     if arg == f"{prefix}auto":
         if autoproxy is None:
             user['auto'].append({'mode': AutoproxyMode.OFF.value, 'server':sid})
@@ -251,7 +251,7 @@ async def auto(message: Message):
             await message.channel.send(content="Will autoproxy with your front in this server.")
         case AutoproxyMode.LATCH.value:
             user['auto'].append({'mode': AutoproxyMode.LATCH.value, 'server': sid})
-            await message.channel.send(content="Will autoproxy with latch in this server. (note: current latch is global)")
+            await message.channel.send(content="Will autoproxy with latch in this server.")
         case _:
             await message.channel.send(content=f"Incorrect argument, use {prefix}auto [off/front/latch]")
 
@@ -402,7 +402,7 @@ async def switch(message: Message):
 commandList: list[Command] = list()
 
 @bot.on(ReadyEvent)
-async def on_ready(_) -> None:
+async def on_ready(event, /) -> None:
     global users
     if not os.path.isfile(path):
         with open(path, 'w') as file:
@@ -432,7 +432,7 @@ async def on_ready(_) -> None:
     Command(name="switch delete", description=f"sw delete", run=switch_delete, shorthand=True)
     Command(name="switch", description=f"usage: {prefix}switch [name] | Log a new switch with the specified members (Requires Auth)\nusage: {prefix}switch move 1d 6h 3m | Move a switch to some time ago (Requires Auth)\nusage: {prefix}switch edit | Edit your current switch (Requires Auth)\nusage: {prefix}switch delete | Delete your current switch (Requires Auth)", run=switch)
     Command(name="case", description=f"usage: {prefix}case | Toggle your proxy's case sensitivity", run=case)
-    Command(name="autoproxy", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last *anywhere on Stoat*", run=auto)
+    Command(name="autoproxy", description=f"usage: {prefix}auto [front/latch] | Set your autoproxy state per-server\n> Front mode will automatically use the first current fronter, while Latch mode will proxy as whoever proxied last in that server", run=auto)
     Command(name="auto", description="ap shorthand", run=auto, shorthand=True)
     Command(name="ap", description="ap shorthand", run=auto, shorthand=True)
     Command(name="sw out", description=f"sw out", run=switch_out, shorthand=True)
@@ -462,11 +462,11 @@ async def on_ready(_) -> None:
                 help_messages.append("")
 
     print('Logged on as', bot.me)
-    await bot.me.edit(status=pyvolt.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=pyvolt.Presence.online))
+    await bot.me.edit(status=stoat.UserStatusEdit(text="Use " + prefix + "setup to get started!", presence=stoat.Presence.online))
 
 
 @bot.on(MessageCreateEvent)
-async def on_message(event: MessageCreateEvent):
+async def on_message(event: MessageCreateEvent, /):
     message = event.message
 
     # don't respond to ourselves/others
@@ -489,7 +489,7 @@ async def on_message(event: MessageCreateEvent):
     # add a command to toggle it and if its true just convert the message to lowercase (only when checking proxy) and then als
     try:
         await send(message)
-    except pyvolt.errors.Forbidden as f:
+    except stoat.errors.Forbidden as f:
         traceback.print_exc()
         await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission + "\nUse rk;permcheck to see which permissions the bot needs, if this doesn't solve the issue please send this to support.")
     except Exception as e:
@@ -505,6 +505,17 @@ async def send(message: Message):
     if not user['proxy']:
         return
 
+    if type(message.channel) is not stoat.TextChannel:
+        sid = message.channel.id
+    else:
+        sid = message.channel.server_id
+
+    if message.content.startswith("\\\\"):
+        user['latch'] = False
+        auto = next((x for x in user['auto'] if x['server'] == sid), None)
+        if auto is not None and auto['mode'] == 'latch':
+            auto['member'] = None
+        return
     if message.content.startswith("\\"):
         user['latch'] = False
         return
@@ -530,7 +541,9 @@ async def send(message: Message):
                 if pt(check):
                     user['latch'] = True
                     proxier = await client.get_member(member['id'])
-                    user['members'].insert(0, user['members'].pop(user['members'].index(member)))
+                    auto = next((x for x in user['auto'] if x['server'] == sid), None)
+                    if auto is not None and auto['mode'] == 'latch':
+                        auto['member'] = member['id']
                     if pt.prefix is not None:
                         content = remove_prefix_ci(content, pre)
                     if pt.suffix is not None:
@@ -560,7 +573,9 @@ async def send(message: Message):
                         if pt(check):
                             user['latch'] = True
                             proxier = await client.get_member(member['id'])
-                            user['members'].insert(0, user['members'].pop(user['members'].index(member)))
+                            auto = next((x for x in user['auto'] if x['server'] == sid), None)
+                            if auto is not None and auto['mode'] == 'latch':
+                                auto['member'] = member['id']
                             if pt.prefix is not None:
                                 content = remove_prefix_ci(emoji.emojize(content, language='alias'), pre)
                             if pt.suffix is not None:
@@ -568,10 +583,6 @@ async def send(message: Message):
                             break
 
         if proxier is None:
-            if type(message.channel) is not pyvolt.TextChannel:
-                sid = message.channel.id
-            else:
-                sid = message.channel.server_id
             auto = next((x for x in user['auto'] if x['server'] == sid), None)
             if auto is None:
                 return
@@ -583,9 +594,8 @@ async def send(message: Message):
                         proxier = member
                         break
                 case AutoproxyMode.LATCH.value:
-                    for member in user['members']:
-                        proxier = await client.get_member(member['id'])
-                        break
+                    if auto.get('member') is not None:
+                        proxier = await client.get_member(auto['member'])
 
     except Unauthorized:
         if user['error']:
@@ -601,13 +611,13 @@ Use {prefix}auth [token] to set your token or {prefix}error off to turn messages
 
     manage = True
     try:
-        if type(message.channel) is not pyvolt.GroupChannel:
+        if type(message.channel) is not stoat.GroupChannel:
             await bot.http.edit_role(server=message.channel.server.id, role="00000000000000000000000000")
         else:
             manage = False
-    except pyvolt.Forbidden:
+    except stoat.Forbidden:
         manage = False
-    except pyvolt.NotFound:
+    except stoat.NotFound:
         _ = ""
     color = None
     if proxier.color is not None and manage:
@@ -642,7 +652,7 @@ Use {prefix}auth [token] to set your token or {prefix}error off to turn messages
     ]
     await message.channel.send(
         content=content,
-        masquerade=pyvolt.MessageMasquerade(name=name[:32], avatar=avatar, color=color),
+        masquerade=stoat.MessageMasquerade(name=name[:32], avatar=avatar, color=color),
         replies=message.replies,
         attachments=files,
         silent=message.is_silent()
@@ -668,4 +678,6 @@ async def save():
             file.write(json.dumps(users))
 
 
-bot.run()
+
+
+bot.run(token, bot=True)
