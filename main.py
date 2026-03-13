@@ -378,8 +378,8 @@ async def switch(message: Message):
     if user is None:
         await message.channel.send(content=f"❌ I don't have you in my database; please run {prefix}setup.")
         return
-    arg = message.content.removeprefix(f"{prefix}switch ")
-    if arg == f"{prefix}switch":
+    arg = message.content.removeprefix(f"{prefix}switch ").removeprefix(f"{prefix}sw ")
+    if arg == f"{prefix}switch" or arg == f"{prefix}sw":
         await message.channel.send(content=f"❌ No member found to switch to.")
         return
     client = pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com")
