@@ -130,9 +130,9 @@ async def case(message: Message):
 
 async def setup(message: Message):
     # todo
-    await message.channel.send(content="""Use `rk;id [SystemID or Discord ID]` to tell RevoltKit who you are! (Note: To obtain your Discord account ID, you'll need to enable Discord's Developer Mode. This is *not* your Discord username!)
-(**OPTIONAL** if your **members, proxies, and front** are **public!**) Use `rk;auth [PluralKitToken]` if you've got private information, or RevoltKit won't be able to proxy properly.
-Finally, to complete setup, use `rk;fetch`! After this first time, every time you update your information on PluralKit (such as proxy tags or members), you'll have to run it again to update it on RevoltKit. It doesn't update automatically.""")
+    await message.channel.send(content=f"""Use `{prefix};id [SystemID or Discord ID]` to tell RevoltKit who you are! (Note: To obtain your Discord account ID, you'll need to enable Discord's Developer Mode. This is *not* your Discord username!)
+(**OPTIONAL** if your **members, proxies, and front** are **public!**) Use `{prefix};auth [PluralKitToken]` if you've got private information, or RevoltKit won't be able to proxy properly.
+Finally, to complete setup, use `{prefix};fetch`! After this first time, every time you update your information on PluralKit (such as proxy tags or members), you'll have to run it again to update it on RevoltKit. It doesn't update automatically.""")
 
 async def explain(message: Message):
     # todo
@@ -194,24 +194,24 @@ async def fetch(message: Message):
         await message.channel.send(content=f"❌ I don't have you in my database; please run {prefix}setup.")
         return
     members = []
-    error = False
     try:
         async for member in pluralkit.Client(user['token'], user_agent="ninty0808@gmail.com").get_members(user['did']):
             try:
-                if not member.proxy_tags:
-                    continue
-                if len(member.proxy_tags.json()) == 0:
+                if member.proxy_tags is None or type(member.proxy_tags) == list:
+                    # this might be jank but it works
+                    members.append({'id': member.id.uuid, 'proxies': None, 'name': member.name})
                     continue
                 members.append({'id': member.id.uuid, 'proxies': member.proxy_tags.json(), 'name': member.name})
-            except:
-                error = True
+            except Exception as e:
+                if user['error']:
+                    print()
+                    await message.channel.send(content=f"""There was an issue fetching member {member.name}: {str(e)} """)
     except Exception as e:
         if user['error']:
             await message.channel.send(content=f"""There was an issue getting your member list, I won't be able to proxy any messages!
                 Please use `{prefix}auth [token]` if you want me to be able to access your privated member list, or `{prefix}error off` to turn messages like these off.
-                **If you have your token set and are still seeing this please contact support** (`rk;support`)**, here is your error message:\n"""+str(e))
+                **If you have your token set and are still seeing this please contact support** (`{prefix};support`)**, here is your error message:\n"""+str(e))
         return
-    
     user['members'] = members
     await message.channel.send(content=f"PK info updated!")
 
@@ -485,7 +485,7 @@ async def on_message(event: MessageCreateEvent, /):
             if message.content.startswith(prefix+command.name):
                 await command.run(message)
                 return
-        await message.channel.send(content=message.content.split()[0] + " is not a valid command; please use rk;help to double-check my commands.")
+        await message.channel.send(content=message.content.split()[0] + f" is not a valid command; please use {prefix};help to double-check my commands.")
         return
 
     # todo: nameformat command
@@ -496,12 +496,12 @@ async def on_message(event: MessageCreateEvent, /):
         await send(message)
     except stoat.errors.Forbidden as f:
         traceback.print_exc()
-        await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission + "\nUse rk;permcheck to see which permissions the bot needs, if this doesn't solve the issue please send this to support.")
+        await message.channel.send(content="**Message could not be proxied, missing permission:**\n - " + f.permission + f"\nUse {prefix};permcheck to see which permissions the bot needs, if this doesn't solve the issue please send this to support.")
     except Exception as e:
         traceback.print_exc()
         await message.channel.send(
             content="**Encountered an unhandled error while sending message:**\n - " + str(e.__class__) + ": " + str(
-                e) + "\nThis could either be a permissions issue or an issue with this bot. Please check RevoltKit's permissions (rk;permcheck) and send this to support.")
+                e) + f"\nThis could either be a permissions issue or an issue with this bot. Please check RevoltKit's permissions ({prefix};permcheck) and send this to support.")
 
 
 async def send(message: Message):
