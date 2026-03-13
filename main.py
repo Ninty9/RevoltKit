@@ -400,6 +400,9 @@ async def switch(message: Message):
     
     return
 
+async def dm_me(message: Message):
+    await message.author.send("Beeb Boop, opening a dm channel!")
+
 commandList: list[Command] = list()
 
 @bot.on(ReadyEvent)
@@ -419,6 +422,7 @@ async def on_ready(event, /) -> None:
     Command(name="explain", description=f"usage: {prefix}explain | A short explanation of RevoltKit", run=explain)
     Command(name="permcheck", description=f"usage: {prefix}permcheck | Check what permissions RevoltKit needs\n> RevoltKit cannot actually check what permissions it needs due to issues outside of our control. For now, RevoltKit will tell you which permissions it *should* have, but server admins will need to manually check whether it actually has them.", run=permcheck)
     Command(name="setup", description=f"usage: {prefix}setup | A quick setup guide for RevoltKit", run=setup)
+    Command(name="dmme", description=f"usage: {prefix}dmme | Will send you a dm to open a dm channel with the bot", run=dm_me)
     Command(name="id", description=f"usage: {prefix}id [pk system id/discord id] | Set your PluralKit system ID or your Discord account ID, so RevoltKit can know who you are\n> Note that if you have private information, you may need to additionally run {prefix}auth", run=id_command)
     Command(name="auth", description=f"usage: {prefix}auth [token] | Give RevoltKit authorization to view private information and log switches", run=auth)
     Command(name="fetch", description=f"usage: {prefix}fetch | Tell RevoltKit to update your PluralKit information", run=fetch)
