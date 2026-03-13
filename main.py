@@ -533,6 +533,8 @@ async def send(message: Message):
         for member in user['members']:
             if proxier is not None:
                 break
+            if member['proxies'] is None:
+                continue
             for proxy in member['proxies']:
                 pre = proxy['prefix']
                 suf = proxy['suffix']
